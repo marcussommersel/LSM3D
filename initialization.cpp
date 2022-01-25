@@ -11,3 +11,14 @@ double Points::minDist(Point point)
     }
     return min;
 }
+
+// bool Points::isInside(Point point){
+//     double dx = 0;
+//     for (auto const& p: this->points){
+//         if (this->points[0].x != p.x){
+//             dx = abs(p.x - this->points[0].x);
+//             break;
+//         }
+//     }
+
+// }

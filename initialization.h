@@ -18,5 +18,6 @@ class Points
 public:
     vector<Point> points;
     double minDist(Point point);
+    // bool isInside(Point point);
     void addPoint(Point point){this->points.push_back(point);}
 };
