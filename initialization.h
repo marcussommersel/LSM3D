@@ -17,7 +17,12 @@ class Points
 {
 public:
     vector<Point> points;
-    double minDist(Point point);
-    // bool isInside(Point point);
     void addPoint(Point point){this->points.push_back(point);}
+    double minDist(Point point);
+    bool isInside(Point p0, Point p1);
+    double signedDistance(Point p);
 };
+
+
+
+bool intercepts(Point p0, Point p1, Point p2, Point p3);

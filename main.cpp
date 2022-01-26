@@ -6,8 +6,15 @@ using namespace std;
 
 int main(){ 
 
-    minDistTest();
+    bool runTests = true;
 
+    if (runTests)
+    {
+        minDistTest();
+        interceptsTest();
+        isInsideTest();
+        signedDistanceTest();
+    }
     // const int n = 10;
     // double x[n];
     // double y[n];
