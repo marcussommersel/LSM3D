@@ -31,6 +31,7 @@ void isInsideTest(){
     p.addPoint(Point(1, 0));
     p.addPoint(Point(1, 1));
     p.addPoint(Point(0, 1));
+    p.addPoint(Point(0, 0));
     cout << p.isInside(Point(0.5, 0.5), Point(2, 0.5)) << endl;
     cout << p.isInside(Point(-1, 0.5), Point(2, 0.5)) << endl;
 }
@@ -42,10 +43,58 @@ void signedDistanceTest(){
     p.addPoint(Point(4, 0));
     p.addPoint(Point(4, 4));
     p.addPoint(Point(0, 4));
+    p.addPoint(Point(0, 0));
     cout.precision(2);
-    for (int i = -4; i < 9; ++i){
-        for (int j = -4; j < 9; ++j){
+    for (int j = 8; j > -5; --j){
+        for (int i = 8; i > -5; --i){
             cout << fixed << p.signedDistance(Point(i,j)) << " ";
+        }
+        cout << endl;
+    }
+}
+
+void simple2DAdvectionTest(){
+    cout << "simple2DAdvectionTest: " << endl;
+    Points p;
+    for (int i = 2; i < 8; ++i){
+        p.addPoint(Point(i, 2));
+    }
+    for (int i = 3; i < 8; ++i){
+        p.addPoint(Point(7, i));
+    }
+    for (int i = 6; i > 1; --i){
+        p.addPoint(Point(i, 7));
+    }
+    for (int i = 6; i > 1; --i){
+        p.addPoint(Point(2, i));
+    }
+    cout.precision(2);
+    int n = 10;
+    int m = 10;
+
+    for (int j = 9; j > -1; --j){
+        for (int i = 0; i < n; ++i){
+            if (p.signedDistance(Point(i,j)) > 0){
+                cout << " ";
+            }
+            cout << fixed << p.signedDistance(Point(i,j)) << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    double phi[n][m];
+    for (int i = 0; i < n; ++i){
+        for (int j = 0; j < m; ++j){
+            phi[i][j] = (p.signedDistance(Point(i,j)));
+        }
+    }
+    for (int j = m; j > -1; --j){
+        for (int i = n; i > -1; --i){
+            if (phi[i][j] > 0){
+                cout << " ";
+            }
+            cout << fixed << phi[i][j] << " ";
         }
         cout << endl;
     }

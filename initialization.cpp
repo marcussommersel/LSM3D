@@ -25,13 +25,21 @@ bool intercepts(Point p0, Point p1, Point p2, Point p3){
     {
         return false;
     } 
-    else
-    {
-        return true;
-    }
 
-    // double x = (b2*c1 - b1*c2)/denominator;
-    // double y = (a1*c2 - a1*c1)/denominator;
+    double x = (b2*c1 - b1*c2)/denominator;
+    double y = (a1*c2 - a2*c1)/denominator;
+
+    double x0 = (x - p0.x)/(p1.x - p0.x);
+    double y0 = (y - p0.y)/(p1.y - p0.y);
+    double x1 = (x - p2.x)/(p3.x - p2.x);
+    double y1 = (y - p2.y)/(p3.y - p2.y);
+
+    if (((x0 >= 0 && x0 <= 1) || (y0 >= 0 && y0 <= 1)) && ((x1 >= 0 && x1 <= 1) || (y1 >= 0 && y1 <= 1))){
+        return true;
+    } else {
+        return false;
+    }
+    // return true;
 }
 
 // int numIntercept(Point p0, Point p1, Point p2, Point p3){
@@ -42,13 +50,13 @@ bool intercepts(Point p0, Point p1, Point p2, Point p3){
 
 bool Points::isInside(Point p0, Point p1){
     int num = 0;
-    for (int i = 0; i < this->points.size()-2; ++i) {
+    for (int i = 0; i < this->points.size()-1; ++i) {
         if (intercepts(p0, p1, this->points[i], this->points[i+1])){
             ++num;
+            if (p0.y == this->points[i+1].y){
+                ++i;
+            }
         }
-    }
-    if (intercepts(p0, p1, this->points[points.size()-1], this->points[0])){
-        ++num;
     }
     if (num%2 == 0) {
         return false;
@@ -59,7 +67,7 @@ bool Points::isInside(Point p0, Point p1){
 
 double Points::signedDistance(Point p){
     double dist = this->minDist(p);
-    if (isInside(p, Point(INFINITY, p.y))){
+    if (isInside(p, Point(1000, p.y))){
         dist = -dist;
     }
     return dist;
