@@ -14,7 +14,7 @@ int main(){
         interceptsTest();
         isInsideTest();
         signedDistanceTest();
-        simple2DAdvectionTest();
+        // simple2DAdvectionTest();
     }
     // const int n = 10;
     // double x[n];

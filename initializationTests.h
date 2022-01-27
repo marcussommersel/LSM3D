@@ -72,8 +72,8 @@ void simple2DAdvectionTest(){
     int n = 10;
     int m = 10;
 
-    for (int j = 9; j > -1; --j){
-        for (int i = 0; i < n; ++i){
+    for (int j = m; j > -1; --j){
+        for (int i = 0; i < n+1; ++i){
             if (p.signedDistance(Point(i,j)) > 0){
                 cout << " ";
             }
@@ -84,17 +84,39 @@ void simple2DAdvectionTest(){
     cout << endl;
 
     double phi[n][m];
-    for (int i = 0; i < n; ++i){
-        for (int j = 0; j < m; ++j){
+    for (int i = 0; i < n+1; ++i){
+        for (int j = 0; j < m+1; ++j){
             phi[i][j] = (p.signedDistance(Point(i,j)));
         }
     }
     for (int j = m; j > -1; --j){
-        for (int i = n; i > -1; --i){
+        for (int i = 0; i < n+1; ++i){
             if (phi[i][j] > 0){
                 cout << " ";
             }
             cout << fixed << phi[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << endl;
+    int it = 5;
+    double phiNew[n][m];
+    for (int k = 0; k < it ; ++k){
+        for (int i = 0; i < n; ++i){
+            for (int j = 0; j < m; ++j){
+                    phiNew[i][j] = phi[i][j] - (phi[i+1][j] - phi[i][j]);
+            }
+        }
+        memcpy(phi, phiNew, sizeof(phi));
+        for (int j = m; j > -1; --j){
+            for (int i = 0; i < n+1; ++i){
+                if (phi[i][j] > 0){
+                    cout << " ";
+                }
+                cout << fixed << phi[i][j] << " ";
+            }
+            cout << endl;
         }
         cout << endl;
     }

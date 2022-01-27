@@ -39,14 +39,7 @@ bool intercepts(Point p0, Point p1, Point p2, Point p3){
     } else {
         return false;
     }
-    // return true;
 }
-
-// int numIntercept(Point p0, Point p1, Point p2, Point p3){
-//     int num = 0;
-
-//     return num;
-// }
 
 bool Points::isInside(Point p0, Point p1){
     int num = 0;
