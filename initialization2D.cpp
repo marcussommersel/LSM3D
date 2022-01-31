@@ -1,6 +1,6 @@
-#include "initialization.h"
+#include "initialization2D.h"
 
-double Points::minDist(Point point)
+double Points2D::minDist(Point2D point)
 {
     double min = INFINITY;
     for (auto const& p: this->points){
@@ -12,7 +12,7 @@ double Points::minDist(Point point)
     return min;
 }
 
-bool intercepts(Point p0, Point p1, Point p2, Point p3){
+bool intercepts(Point2D p0, Point2D p1, Point2D p2, Point2D p3){
     double a1 = p1.y - p0.y;
     double b1 = p0.x - p1.x;
     double c1 = a1*p0.x + b1*p0.y;
@@ -41,7 +41,7 @@ bool intercepts(Point p0, Point p1, Point p2, Point p3){
     }
 }
 
-bool Points::isInside(Point p0, Point p1){
+bool Points2D::isInside(Point2D p0, Point2D p1){
     int num = 0;
     for (int i = 0; i < this->points.size()-1; ++i) {
         if (intercepts(p0, p1, this->points[i], this->points[i+1])){
@@ -58,9 +58,9 @@ bool Points::isInside(Point p0, Point p1){
     }
 }
 
-double Points::signedDistance(Point p){
+double Points2D::signedDistance(Point2D p){
     double dist = this->minDist(p);
-    if (isInside(p, Point(1000, p.y))){
+    if (isInside(p, Point2D(1000, p.y))){
         dist = -dist;
     }
     return dist;

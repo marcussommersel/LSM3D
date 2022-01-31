@@ -1,7 +1,7 @@
 #include <vector>
 #include <iostream>
-#include "initialization.h"
-#include "initializationTests.h"
+#include "initialization2D.h"
+#include "initialization2DTests.h"
 using namespace std;
 
 int main(){ 
@@ -10,11 +10,12 @@ int main(){
 
     if (runTests)
     {
-        minDistTest();
-        interceptsTest();
-        isInsideTest();
-        signedDistanceTest();
+        // minDistTest();
+        // interceptsTest();
+        // isInsideTest();
+        // signedDistanceTest();
         // simple2DAdvectionTest();
+        cubeTest();
     }
     // const int n = 10;
     // double x[n];
