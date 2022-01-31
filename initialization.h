@@ -5,6 +5,8 @@
 #include <cmath>
 using namespace std;
 
+#define PI 3.14159265
+
 class Point 
 {
 public:
@@ -19,6 +21,7 @@ class Points
 public:
     vector<Point> points;
     void addPoint(Point point){this->points.push_back(point);}
+    void saveMatrix(string filename);
     // double minDist(Point point);
     // bool isInside(Point p0, Point p1);
     // double signedDistance(Point p);

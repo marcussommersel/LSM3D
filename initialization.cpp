@@ -1,4 +1,19 @@
 #include "initialization.h"
+#include <iostream>
+#include <fstream>
+
+void Points::saveMatrix(string filename){
+    ofstream file;
+    file.open(filename);
+    if (file.is_open()) {
+        file << "x, y, z" << endl;
+        for (int i = 0; i < this->points.size(); ++i){
+            file << points[i].x << ", " << points[i].y << ", " << points[i].z << endl;
+        }
+    } else {cout << "could not open file." << endl;}
+
+    file.close();
+}
 
 // double Points::minDist(Point point)
 // {
@@ -13,7 +28,7 @@
 // }
 
 bool planeIntercepts(Point p0, Point p1, Point p2, Point p3){
-
+    return 0;
 }
 
 // bool Points::isInside(Point p0, Point p1){

@@ -2,6 +2,8 @@
 #include <iostream>
 #include "initialization2D.h"
 #include "initialization2DTests.h"
+#include "initialization.h"
+#include "initializationTests.h"
 using namespace std;
 
 int main(){ 
