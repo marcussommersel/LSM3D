@@ -15,13 +15,13 @@ void minDistTest(){
     cout << p.minDist(Point2D(1.1, 0.9)) << endl;
 }
 
-void interceptsTest(){
+void lineInterceptsTest(){
     cout << "interceptsTest: Should return 1, 0, 1, 1, 0" << endl;
-    cout << intercepts(Point2D(-1, 0), Point2D(1, 0), Point2D(0, 1), Point2D(0, -1)) << endl;
-    cout << intercepts(Point2D(-1, 0), Point2D(1, 0), Point2D(-1, 1), Point2D(1, 1)) << endl;
-    cout << intercepts(Point2D(-1, 0), Point2D(0, 0), Point2D(0, 1), Point2D(0, -1)) << endl;
-    cout << intercepts(Point2D(-1, 0), Point2D(1, 0), Point2D(0.0, 0.5), Point2D(1, -0.5)) << endl;
-    cout << intercepts(Point2D(-1, 0), Point2D(1, 0), Point2D(0, 1), Point2D(0, 2)) << endl;
+    cout << lineIntercepts(Point2D(-1, 0), Point2D(1, 0), Point2D(0, 1), Point2D(0, -1)) << endl;
+    cout << lineIntercepts(Point2D(-1, 0), Point2D(1, 0), Point2D(-1, 1), Point2D(1, 1)) << endl;
+    cout << lineIntercepts(Point2D(-1, 0), Point2D(0, 0), Point2D(0, 1), Point2D(0, -1)) << endl;
+    cout << lineIntercepts(Point2D(-1, 0), Point2D(1, 0), Point2D(0.0, 0.5), Point2D(1, -0.5)) << endl;
+    cout << lineIntercepts(Point2D(-1, 0), Point2D(1, 0), Point2D(0, 1), Point2D(0, 2)) << endl;
 }
 
 void isInsideTest(){
@@ -100,33 +100,25 @@ void simple2DAdvectionTest(){
     }
 
     cout << endl;
-    int it = 5;
-    double phiNew[n][m];
-    for (int k = 0; k < it ; ++k){
-        for (int i = 0; i < n; ++i){
-            for (int j = 0; j < m; ++j){
-                    phiNew[i][j] = phi[i][j] - (phi[i+1][j] - phi[i][j]);
-            }
-        }
-        memcpy(phi, phiNew, sizeof(phi));
-        for (int j = m; j > -1; --j){
-            for (int i = 0; i < n+1; ++i){
-                if (phi[i][j] > 0){
-                    cout << " ";
-                }
-                cout << fixed << phi[i][j] << " ";
-            }
-            cout << endl;
-        }
-        cout << endl;
-    }
+    // int it = 5;
+    // double phiNew[n][m];
+    // for (int k = 0; k < it ; ++k){
+    //     for (int i = 0; i < n; ++i){
+    //         for (int j = 0; j < m; ++j){
+    //                 phiNew[i][j] = phi[i][j] - (phi[i+1][j] - phi[i][j]);
+    //         }
+    //     }
+    //     memcpy(phi, phiNew, sizeof(phi));
+    //     for (int j = m; j > -1; --j){
+    //         for (int i = 0; i < n+1; ++i){
+    //             if (phi[i][j] > 0){
+    //                 cout << " ";
+    //             }
+    //             cout << fixed << phi[i][j] << " ";
+    //         }
+    //         cout << endl;
+    //     }
+    //     cout << endl;
+    // }
 }
 
-void cubeTest(){
-    double rho = 1;
-    double theta;
-    double phi;
-    double x = rho*cos(theta)*sin(phi);
-    double y = rho*sin(theta)*sin(phi);
-    double z = rho*cos(phi);
-}

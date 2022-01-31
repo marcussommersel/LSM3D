@@ -25,4 +25,4 @@ public:
 
 
 
-bool intercepts(Point2D p0, Point2D p1, Point2D p2, Point2D p3);
+bool lineIntercepts(Point2D p0, Point2D p1, Point2D p2, Point2D p3);

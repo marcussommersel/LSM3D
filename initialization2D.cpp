@@ -12,7 +12,7 @@ double Points2D::minDist(Point2D point)
     return min;
 }
 
-bool intercepts(Point2D p0, Point2D p1, Point2D p2, Point2D p3){
+bool lineIntercepts(Point2D p0, Point2D p1, Point2D p2, Point2D p3){
     double a1 = p1.y - p0.y;
     double b1 = p0.x - p1.x;
     double c1 = a1*p0.x + b1*p0.y;
@@ -44,7 +44,7 @@ bool intercepts(Point2D p0, Point2D p1, Point2D p2, Point2D p3){
 bool Points2D::isInside(Point2D p0, Point2D p1){
     int num = 0;
     for (int i = 0; i < this->points.size()-1; ++i) {
-        if (intercepts(p0, p1, this->points[i], this->points[i+1])){
+        if (lineIntercepts(p0, p1, this->points[i], this->points[i+1])){
             ++num;
             if (p0.y == this->points[i+1].y){
                 ++i;
