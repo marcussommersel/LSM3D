@@ -40,7 +40,7 @@ private:
 public:
     Planes(Point p0, Point p1, Point p2, Point p3);
     vector<Points> planes;
-    void findPlanes(Points pts);
+    // void findPlanes(Points pts);
 };
 
 bool isInsideSphere(double r, Point c, Point p);

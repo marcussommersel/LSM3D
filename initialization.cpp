@@ -33,11 +33,11 @@ void Points::saveMatrix(string filename){
     file.close();
 }
 
-void Planes::findPlanes(Points pts){
-    for (auto const& p: pts.points){
-        cout << " ";
-    }
-}
+// void Planes::findPlanes(Points pts){
+//     for (auto const& p: pts.points){
+//         cout << " ";
+//     }
+// }
 
 Planes::Planes(Point p0, Point p1, Point p2, Point p3){
     Points points;
