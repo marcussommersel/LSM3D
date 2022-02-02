@@ -2,17 +2,66 @@
 #include <iostream>
 #include <fstream>
 
+Point Point::operator+(Point const &p){
+    Point temp;
+    temp.x = x + p.x;
+    temp.y = y + p.y;
+    temp.z = z + p.z;
+    return temp;
+}
+
+void Point::operator=(Point const &p){
+    x = p.x;
+    y = p.y;
+    z = p.z;
+}
+
+double Point::length(Point const &p){
+    return sqrt((x + p.x)*(x + p.x) + (y + p.y)*(y + p.y) + (z + p.z)*(z + p.z));
+}
+
 void Points::saveMatrix(string filename){
     ofstream file;
     file.open(filename);
     if (file.is_open()) {
         file << "x, y, z" << endl;
         for (int i = 0; i < this->points.size(); ++i){
-            file << points[i].x << ", " << points[i].y << ", " << points[i].z << endl;
+            file << points[i].x << "," << points[i].y << "," << points[i].z << "," << endl;
         }
     } else {cout << "could not open file." << endl;}
 
     file.close();
+}
+
+void Planes::findPlanes(Points pts){
+    for (auto const& p: pts.points){
+        cout << " ";
+    }
+}
+
+Planes::Planes(Point p0, Point p1, Point p2, Point p3){
+    Points points;
+    points.addPoint(p0);
+    points.addPoint(p1);
+    points.addPoint(p2);
+    points.addPoint(p3);
+    this->addPlane(points);
+}
+
+bool isInsideSphere(double r, Point c, Point p){
+    if ((p.length(c) - r) < 0){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+double signedDistanceSphere(double r, Point c, Point p){
+    double dist = p.length(c);
+    if (isInsideSphere(r, c, p)){
+        dist = -dist;
+    }
+    return dist;
 }
 
 // double Points::minDist(Point point)

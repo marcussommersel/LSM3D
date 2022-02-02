@@ -22,10 +22,18 @@ void cubeTest(){
 
     p.saveMatrix("file.txt");
     cout << endl;
+}
 
-
-
-
-
-
+void isInsideSphereTest(){
+    Point c0 = Point(0,0,0);
+    Point c1 = Point(1,2,1);
+    Point p0 = Point(1,0,0);
+    Point p1 = Point(3,2,4);
+    double r0 = 5;
+    double r1 = 0.5;
+    double r2 = 1;
+    cout << isInsideSphere(r0, c0, p0) << endl;
+    cout << isInsideSphere(r1, c0, p0) << endl;
+    cout << isInsideSphere(r0, c1, p0) << endl;
+    cout << isInsideSphere(r0, c1, p1) << endl;
 }

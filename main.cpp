@@ -17,7 +17,8 @@ int main(){
         // isInsideTest();
         // signedDistanceTest();
         // simple2DAdvectionTest();
-        cubeTest();
+        // cubeTest();
+        isInsideSphereTest();
     }
     // const int n = 10;
     // double x[n];
