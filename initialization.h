@@ -17,7 +17,6 @@ public:
     Point(){x = 0; y = 0; z = 0;}
     Point operator+(Point const &p);
     void operator=(Point const &p);
-    double length(Point const &p);
 };
 
 class Points
@@ -43,7 +42,17 @@ public:
     // void findPlanes(Points pts);
 };
 
+double length(Point const &p0, Point const &p1);
+
 bool isInsideSphere(double r, Point c, Point p);
 // bool planeIntercepts(Point p0, Point p1, Point p2, Point p3);
 
 double signedDistanceSphere(double r, Point c, Point p);
+
+void signedDistanceField(double *arr, vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int O);
+
+// void signedDistanceField(double arr[], vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int O);
+
+vector<double> linspace(double start, double end, int n);
+
+void saveScalarField(string filename, double *arr, vector<double> x, vector<double> y, vector<double> z, int M, int N, int O);
