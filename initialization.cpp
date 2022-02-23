@@ -64,8 +64,8 @@ double signedDistanceSphere(double r, Point c, Point p){
     return length(p, c) - r;
 }
 
-void signedDistanceField(double *arr, vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int O){
-    for (int k = 0; k < O; ++k){
+void signedDistanceField(double *arr, vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int P){
+    for (int k = 0; k < P; ++k){
         for (int j = 0; j < N; ++j){
             for (int i = 0; i < M; ++i){
                 *arr = signedDistanceSphere(r, c, Point(x[i], y[j], z[k]));
@@ -75,8 +75,8 @@ void signedDistanceField(double *arr, vector<double> x, vector<double> y, vector
     }
 }
 
-// void signedDistanceField(double arr[], vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int O){
-//     for (int k = 0; k < O; ++k){
+// void signedDistanceField(double arr[], vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int P){
+//     for (int k = 0; k < P; ++k){
 //         for (int j = 0; j < N; ++j){
 //             for (int i = 0; i < M; ++i){
 //                 arr[i*M + j*N + k*O] = signedDistanceSphere(r, c, Point(x[i], y[j], z[k]));
@@ -124,13 +124,13 @@ bool planeIntercepts(Point p0, Point p1, Point p2, Point p3){
     return 0;
 }
 
-void saveScalarField(string filename, double *arr, vector<double> x, vector<double> y, vector<double> z, int M, int N, int O){
+void saveScalarField(string filename, double *arr, vector<double> x, vector<double> y, vector<double> z, int M, int N, int P){
     ofstream file;
     file.open(filename);
     if (!file.is_open()){cout << "could not open file." << endl;}
         
-    file << M << "," << N << "," << O << endl;
-    for (int k = 0; k < O; ++k){
+    file << M << "," << N << "," << P << endl;
+    for (int k = 0; k < P; ++k){
         for (int j = 0; j < N; ++j){
             for (int i = 0; i < M; ++i){
                 file << x[i] << "," << y[j] << "," << z[k] << "," << *arr << "," << endl;

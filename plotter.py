@@ -11,13 +11,13 @@ def readFile(filename):
     f.close()
     m = int(firstLine[0])
     n = int(firstLine[1])
-    o = int(firstLine[2])
+    p = int(firstLine[2])
 
     f = open(filename)
-    phi = np.zeros((m,n,o))
+    phi = np.zeros((m,n,p))
     lines = f.readlines()[1:]
     count = 0
-    for k in range(o):
+    for k in range(p):
         for j in range(n):
             for i in range(m):
                 phi[i,j,k] = float(lines[count].split(',')[3])

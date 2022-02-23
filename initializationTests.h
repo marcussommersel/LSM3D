@@ -52,7 +52,7 @@ void signedDistanceSphereTest(){
 void signedDistanceFieldTest(){
     const int m = 10;
     const int n = 10; 
-    const int o = 10;
+    const int p = 10;
     const double xStart = 0;
     const double xEnd = 10;
     const double yStart = 0;
@@ -61,20 +61,20 @@ void signedDistanceFieldTest(){
     const double zEnd = 10;
     vector<double> x = linspace(xStart, xEnd, m);
     vector<double> y = linspace(yStart, yEnd, n);
-    vector<double> z = linspace(zStart, zEnd, o);
-    double phi[m*n*o];
+    vector<double> z = linspace(zStart, zEnd, p);
+    double phi[m*n*p];
     Point c = Point(5,5,5);
     double r = 3;
 
-    signedDistanceField(phi, x, y, z, r, c, m, n, o);
-    for (int k = 0; k < o; ++k){
+    signedDistanceField(phi, x, y, z, r, c, m, n, p);
+    for (int k = 0; k < p; ++k){
         for (int j = 0; j < n; ++j){
             for (int i = 0; i < m; ++i){
-                cout << phi[i + j*n + k*o*o] << " ";
+                cout << phi[i + j*n + k*p*p] << " ";
             }
             cout << endl;
         }
         cout << endl << endl;
     }
-    saveScalarField("scaleField.txt", phi, x, y, z, m, n, o);
+    saveScalarField("scaleField.txt", phi, x, y, z, m, n, p);
 }
