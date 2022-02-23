@@ -64,12 +64,11 @@ double signedDistanceSphere(double r, Point c, Point p){
     return length(p, c) - r;
 }
 
-void signedDistanceField(double *arr, vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int P){
+void signedDistanceField(vector<double> &arr, vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int P){ // Fix
     for (int k = 0; k < P; ++k){
         for (int j = 0; j < N; ++j){
             for (int i = 0; i < M; ++i){
-                *arr = signedDistanceSphere(r, c, Point(x[i], y[j], z[k]));
-                ++arr;
+                arr.push_back(signedDistanceSphere(r, c, Point(x[i], y[j], z[k])));
             }
         }
     }
@@ -124,17 +123,18 @@ bool planeIntercepts(Point p0, Point p1, Point p2, Point p3){
     return 0;
 }
 
-void saveScalarField(string filename, double *arr, vector<double> x, vector<double> y, vector<double> z, int M, int N, int P){
+void saveScalarField(string filename, vector<double> const &arr, vector<double> x, vector<double> y, vector<double> z, int M, int N, int P){ // Fix
     ofstream file;
     file.open(filename);
     if (!file.is_open()){cout << "could not open file." << endl;}
         
     file << M << "," << N << "," << P << endl;
+    int count = 0;
     for (int k = 0; k < P; ++k){
         for (int j = 0; j < N; ++j){
             for (int i = 0; i < M; ++i){
-                file << x[i] << "," << y[j] << "," << z[k] << "," << *arr << "," << endl;
-                ++arr;
+                file << x[i] << "," << y[j] << "," << z[k] << "," << arr[count] << "," << endl;
+                ++count;
             }
         }
     }

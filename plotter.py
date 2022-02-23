@@ -37,6 +37,8 @@ def getSurface(volume, level=0, plot=True):
         ax.set_xlim(0, 9)
         ax.set_ylim(0, 9)
         ax.set_zlim(0, 9)
+        plt.xlabel('x')
+        plt.ylabel('y')
         plt.show()
 
 def printScatter(filename):

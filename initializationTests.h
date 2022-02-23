@@ -62,7 +62,7 @@ void signedDistanceFieldTest(){
     vector<double> x = linspace(xStart, xEnd, m);
     vector<double> y = linspace(yStart, yEnd, n);
     vector<double> z = linspace(zStart, zEnd, p);
-    double phi[m*n*p];
+    vector<double> phi;
     Point c = Point(5,5,5);
     double r = 3;
 
