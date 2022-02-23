@@ -37,3 +37,44 @@ void isInsideSphereTest(){
     cout << isInsideSphere(r0, c1, p0) << endl;
     cout << isInsideSphere(r0, c1, p1) << endl;
 }
+
+void signedDistanceSphereTest(){
+    Point p0 = Point(5, 5, 5);
+    Point p1 = Point(5, 0, 5);
+    Point p2 = Point(5, 3, 5);
+    Point p3 = Point(5, 4, 5);
+    cout << length(p1, p0) << endl;
+    cout << signedDistanceSphere(2, p0, p1) << endl;
+    cout << signedDistanceSphere(2, p0, p2) << endl;
+    cout << signedDistanceSphere(2, p0, p3) << endl;
+}
+
+void signedDistanceFieldTest(){
+    const int m = 10;
+    const int n = 10; 
+    const int o = 10;
+    const double xStart = 0;
+    const double xEnd = 10;
+    const double yStart = 0;
+    const double yEnd = 10;
+    const double zStart = 0;
+    const double zEnd = 10;
+    vector<double> x = linspace(xStart, xEnd, m);
+    vector<double> y = linspace(yStart, yEnd, n);
+    vector<double> z = linspace(zStart, zEnd, o);
+    double phi[m*n*o];
+    Point c = Point(5,5,5);
+    double r = 3;
+
+    signedDistanceField(phi, x, y, z, r, c, m, n, o);
+    for (int k = 0; k < o; ++k){
+        for (int j = 0; j < n; ++j){
+            for (int i = 0; i < m; ++i){
+                cout << phi[i + j*n + k*o*o] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl << endl;
+    }
+    saveScalarField("scaleField.txt", phi, x, y, z, m, n, o);
+}

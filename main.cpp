@@ -18,8 +18,25 @@ int main(){
         // signedDistanceTest();
         // simple2DAdvectionTest();
         // cubeTest();
-        isInsideSphereTest();
+        // isInsideSphereTest();
+        // signedDistanceSphereTest();
+        signedDistanceFieldTest();
     }
+
+    // int n = 500;
+    // int* array = new int[n*n*n];
+    // for (int k = 0; k < n; ++k){
+    //     for (int j = 0; j < n; ++j){
+    //         for (int i = 0; i < n; ++i){
+    //             array[i + j*n + k*n*n] = i + j + k;
+    //             cout << array[i + j*n + k*n*n] << endl;
+    //             cout << i << " " << j << " " << k << endl;
+    //         }
+    //     }
+    // }
+
+
+
     // const int n = 10;
     // double x[n];
     // double y[n];
