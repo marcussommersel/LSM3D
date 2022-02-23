@@ -16,10 +16,6 @@ void Point::operator=(Point const &p){
     z = p.z;
 }
 
-double Point::length(Point const &p){
-    return sqrt((x + p.x)*(x + p.x) + (y + p.y)*(y + p.y) + (z + p.z)*(z + p.z));
-}
-
 void Points::saveMatrix(string filename){
     ofstream file;
     file.open(filename);
@@ -48,8 +44,12 @@ Planes::Planes(Point p0, Point p1, Point p2, Point p3){
     this->addPlane(points);
 }
 
+double length(Point const &p0, Point const &p1){
+    return sqrt((p0.x - p1.x)*(p0.x - p1.x) + (p0.y - p1.y)*(p0.y - p1.y) + (p0.z - p1.z)*(p0.z - p1.z));
+}
+
 bool isInsideSphere(double r, Point c, Point p){
-    if ((p.length(c) - r) < 0){
+    if ((length(c, p) - r) < 0){
         return true;
     } else {
         return false;
@@ -57,11 +57,55 @@ bool isInsideSphere(double r, Point c, Point p){
 }
 
 double signedDistanceSphere(double r, Point c, Point p){
-    double dist = p.length(c);
+
     if (isInsideSphere(r, c, p)){
-        dist = -dist;
+        return -(r - length(p, c));
     }
-    return dist;
+    return length(p, c) - r;
+}
+
+void signedDistanceField(double *arr, vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int O){
+    for (int k = 0; k < O; ++k){
+        for (int j = 0; j < N; ++j){
+            for (int i = 0; i < M; ++i){
+                *arr = signedDistanceSphere(r, c, Point(x[i], y[j], z[k]));
+                ++arr;
+            }
+        }
+    }
+}
+
+// void signedDistanceField(double arr[], vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int O){
+//     for (int k = 0; k < O; ++k){
+//         for (int j = 0; j < N; ++j){
+//             for (int i = 0; i < M; ++i){
+//                 arr[i*M + j*N + k*O] = signedDistanceSphere(r, c, Point(x[i], y[j], z[k]));
+//                 cout << signedDistanceSphere(r, c, Point(x[i], y[j], z[k])) << endl;
+//             }
+//         }
+//     }
+// }
+
+vector<double> linspace(double start, double end, int n){
+
+    vector<double> vec;
+
+    if (n == 0) { 
+        return vec;
+    }
+    if (n == 1) {
+      vec.push_back(start);
+      return vec;
+    }
+
+    double dx = (end - start)/(n - 1);
+
+    for(int i = 0; i < n - 1; ++i){
+        vec.push_back(start + dx * i);
+    }
+    vec.push_back(end);
+
+    return vec;
 }
 
 // double Points::minDist(Point point)
@@ -78,6 +122,23 @@ double signedDistanceSphere(double r, Point c, Point p){
 
 bool planeIntercepts(Point p0, Point p1, Point p2, Point p3){
     return 0;
+}
+
+void saveScalarField(string filename, double *arr, vector<double> x, vector<double> y, vector<double> z, int M, int N, int O){
+    ofstream file;
+    file.open(filename);
+    if (!file.is_open()){cout << "could not open file." << endl;}
+        
+    file << M << "," << N << "," << O << endl;
+    for (int k = 0; k < O; ++k){
+        for (int j = 0; j < N; ++j){
+            for (int i = 0; i < M; ++i){
+                file << x[i] << "," << y[j] << "," << z[k] << "," << *arr << "," << endl;
+                ++arr;
+            }
+        }
+    }
+    file.close();
 }
 
 // bool Points::isInside(Point p0, Point p1){
