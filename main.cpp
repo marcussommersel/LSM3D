@@ -4,6 +4,9 @@
 #include "initialization2DTests.h"
 #include "initialization.h"
 #include "initializationTests.h"
+#include "schemes.h"
+#include "schemesTest.h"
+#include "vectorUtilities.h"
 using namespace std;
 
 int main(){ 
@@ -20,7 +23,8 @@ int main(){
         // cubeTest();
         // isInsideSphereTest();
         // signedDistanceSphereTest();
-        signedDistanceFieldTest();
+        // signedDistanceFieldTest();
+        euler_upwindTest();
     }
 
     // int n = 500;

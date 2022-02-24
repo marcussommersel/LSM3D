@@ -8,5 +8,10 @@
 using namespace std;
 
 // auto vortexVelocity(int M, int N, int P);
+struct Velocity {
+    vector<double> x;
+    vector<double> y;
+    vector<double> z;
+};
 
-auto simpleVelocity(int M, int N, int P);
+Velocity simpleVelocity(int M, int N, int P);
