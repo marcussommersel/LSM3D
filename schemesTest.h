@@ -7,9 +7,9 @@
 using namespace std;
 
 void euler_upwindTest(){
-    const int m = 10;
-    const int n = 10; 
-    const int p = 10;
+    const int m = 64;
+    const int n = 64; 
+    const int p = 64;
     const double xStart = 0;
     const double xEnd = 10;
     const double yStart = 0;
@@ -31,10 +31,8 @@ void euler_upwindTest(){
     double dy = 1;
     double dz = 1;
 
-    string name = "0";
     for (double t = 0; t < 5; t += dt){
-        saveScalarField(name + ".txt", phi, x, y, z, m, n, p);
+        saveScalarField(to_string(t) + ".txt", phi, x, y, z, m, n, p);
         euler_upwind(phi, ax, ay, az, m, n, p, dx, dy, dz, dt);
-        name += 1;
     } 
 }

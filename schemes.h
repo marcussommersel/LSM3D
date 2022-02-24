@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <array>
 #include <tuple>
 #include <functional>
 #include "vectorUtilities.h"

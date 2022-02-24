@@ -126,7 +126,7 @@ bool planeIntercepts(Point p0, Point p1, Point p2, Point p3){
 void saveScalarField(string filename, vector<double> const &arr, vector<double> x, vector<double> y, vector<double> z, int M, int N, int P){
     ofstream file;
     file.open(filename);
-    if (!file.is_open()){cout << "could not open file." << endl;}
+    if (!file.is_open()){cerr << "could not open file." << endl;}
         
     file << M << "," << N << "," << P << endl;
     int count = 0;

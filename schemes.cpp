@@ -1,14 +1,23 @@
 #include "schemes.h"
 
-Derivative upwind(vector<double> &arr, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int N, int P, double dx, double dy, double dz){
+Derivative upwind(vector<double> &arr, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int const N, int const P, double dx, double dy, double dz){
+
+    // const size_t size = M*N*P;
     vector<double> phix;
     vector<double> phiy;
     vector<double> phiz;
 
-    for (int k = 1; k < P; ++k){
-        for (int j = 1; j < N; ++j){
-            for (int i = 1; i < M; ++i){
+    for (int k = 0; k < P; ++k){
+        for (int j = 0; j < N; ++j){
+            for (int i = 0; i < M; ++i){
                 
+                if (i==0 || i==M-1 || j==0 || j==N-1 || k==0 || k==P-1){
+                    phix.push_back(0);
+                    phiy.push_back(0);
+                    phiz.push_back(0);
+                    continue;
+                }
+
                 if (AX[i + j*N + k*P*P] >= 0){
                     phix.push_back((arr[i + j*N + k*P*P] - arr[(i - 1) + j*N + k*P*P])/dx);
                 } else if (AX[i + j*N + k*P*P] < 0){
@@ -29,6 +38,7 @@ Derivative upwind(vector<double> &arr, vector<double> AX, vector<double> AY, vec
             }
         }
     }
+    cout << phix.size() << " " << phiy.size() << " " << phiz.size() << endl;
     return Derivative{phix, phiy, phiz};
 }
 

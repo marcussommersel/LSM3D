@@ -22,21 +22,22 @@ def readFile(filename):
             for i in range(m):
                 phi[i,j,k] = float(lines[count].split(',')[3])
                 count += 1
-    return phi
+    return phi, m, n, p
 
-def getSurface(volume, level=0, plot=True):
+def getSurface(volume, m, n, p, level=0, plot=True):
     verts, faces, normals, values = measure.marching_cubes(volume, level)
+    size = max(m, n, p)
     if plot:
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
         ax.set_box_aspect([1,1,1])
-        mesh = Poly3DCollection(verts[faces])
+        mesh = Poly3DCollection(verts[faces]/size)
         mesh.set_edgecolor('k')
         ax.add_collection3d(mesh)
         plt.tight_layout()
-        ax.set_xlim(0, 9)
-        ax.set_ylim(0, 9)
-        ax.set_zlim(0, 9)
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.set_zlim(0, 1)
         plt.xlabel('x')
         plt.ylabel('y')
         plt.show()
@@ -68,8 +69,16 @@ def printScatter(filename):
     plt.show()
 
 def main():
-    phi = readFile('scaleField.txt')
-    getSurface(phi, 0, True)
+    phi, m, n, p = readFile('0.000000.txt')
+    getSurface(phi, m, n, p, 0, True)
+    phi, m, n, p = readFile('1.000000.txt')
+    getSurface(phi, m, n, p, 0, True)
+    phi, m, n, p = readFile('2.000000.txt')
+    getSurface(phi, m, n, p, 0, True)
+    phi, m, n, p = readFile('3.000000.txt')
+    getSurface(phi, m, n, p, 0, True)
+    phi, m, n, p = readFile('4.000000.txt')
+    getSurface(phi, m, n, p, 0, True)
     # printScatter('file.txt')
 
 if __name__=='__main__':
