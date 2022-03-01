@@ -24,7 +24,7 @@ def readFile(filename):
                 count += 1
     return phi, m, n, p
 
-def getSurface(volume, m, n, p, level=0, plot=True):
+def getSurface(volume, m, n, p, level=0, plot=True, filename='fig'):
     verts, faces, normals, values = measure.marching_cubes(volume, level)
     size = max(m, n, p)
     if plot:
@@ -40,7 +40,8 @@ def getSurface(volume, m, n, p, level=0, plot=True):
         ax.set_zlim(0, 1)
         plt.xlabel('x')
         plt.ylabel('y')
-        plt.show()
+        plt.savefig(filename + '.png')
+        plt.close()
 
 def printScatter(filename):
     f = open(filename)
@@ -70,16 +71,15 @@ def printScatter(filename):
 
 def main():
     phi, m, n, p = readFile('0.000000.txt')
-    getSurface(phi, m, n, p, 0, True)
+    getSurface(phi, m, n, p, 0, True, 'fig0')
     phi, m, n, p = readFile('1.000000.txt')
-    getSurface(phi, m, n, p, 0, True)
+    getSurface(phi, m, n, p, 0, True, 'fig1')
     phi, m, n, p = readFile('2.000000.txt')
-    getSurface(phi, m, n, p, 0, True)
+    getSurface(phi, m, n, p, 0, True, 'fig2')
     phi, m, n, p = readFile('3.000000.txt')
-    getSurface(phi, m, n, p, 0, True)
+    getSurface(phi, m, n, p, 0, True, 'fig3')
     phi, m, n, p = readFile('4.000000.txt')
-    getSurface(phi, m, n, p, 0, True)
-    # printScatter('file.txt')
+    getSurface(phi, m, n, p, 0, True, 'fig4')
 
 if __name__=='__main__':
     main()
