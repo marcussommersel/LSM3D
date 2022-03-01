@@ -7,9 +7,9 @@
 using namespace std;
 
 void euler_upwindTest(){
-    const int m = 64;
-    const int n = 64; 
-    const int p = 64;
+    const int m = 32;
+    const int n = 32; 
+    const int p = 32;
     const double xStart = 0;
     const double xEnd = 10;
     const double yStart = 0;
@@ -24,7 +24,7 @@ void euler_upwindTest(){
     double r = 3;
 
     signedDistanceField(phi, x, y, z, r, c, m, n, p);
-    auto [ax, ay, az] = simpleVelocity(m, n, p);
+    auto [ax, ay, az] = vortexVelocity(m, n, p, x, y, z);
 
     double dt = 1;
     double dx = 1;
@@ -33,6 +33,6 @@ void euler_upwindTest(){
 
     for (double t = 0; t < 5; t += dt){
         saveScalarField(to_string(t) + ".txt", phi, x, y, z, m, n, p);
-        euler_upwind(phi, ax, ay, az, m, n, p, dx, dy, dz, dt);
+        euler_weno(phi, ax, ay, az, m, n, p, dx, dy, dz, dt);
     } 
 }
