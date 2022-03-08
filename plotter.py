@@ -40,7 +40,7 @@ def getSurface(volume, m, n, p, level=0, plot=True, filename='fig'):
         ax.set_zlim(0, 1)
         plt.xlabel('x')
         plt.ylabel('y')
-        plt.savefig(filename + '.png')
+        plt.savefig('figures/' + filename + '.png')
         plt.close()
 
 def printScatter(filename):
@@ -70,16 +70,10 @@ def printScatter(filename):
     plt.show()
 
 def main():
-    phi, m, n, p = readFile('0.000000.txt')
-    getSurface(phi, m, n, p, 0, True, 'fig0')
-    phi, m, n, p = readFile('1.000000.txt')
-    getSurface(phi, m, n, p, 0, True, 'fig1')
-    phi, m, n, p = readFile('2.000000.txt')
-    getSurface(phi, m, n, p, 0, True, 'fig2')
-    phi, m, n, p = readFile('3.000000.txt')
-    getSurface(phi, m, n, p, 0, True, 'fig3')
-    phi, m, n, p = readFile('4.000000.txt')
-    getSurface(phi, m, n, p, 0, True, 'fig4')
+    f = open('plotTimes.txt')
+    for line in f.readlines():
+        phi, m, n, p = readFile(line[:-1] + '.txt')
+        getSurface(phi, m, n, p, 0, True, line[:-1])
 
 if __name__=='__main__':
     main()
