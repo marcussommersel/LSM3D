@@ -16,6 +16,6 @@ struct Velocity {
     vector<double> z;
 };
 
-Velocity vortexVelocity(int M, int N, int P, vector<double> U, vector<double> V, vector<double> W);
+Velocity vortexVelocity(int M, int N, int P, vector<double> X, vector<double> Y, vector<double> Z);
 
 Velocity simpleVelocity(int M, int N, int P);

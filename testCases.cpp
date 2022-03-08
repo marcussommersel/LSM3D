@@ -1,6 +1,6 @@
 #include "testCases.h"
 
-Velocity vortexVelocity(int M, int N, int P, vector<double> x, vector<double> y, vector<double> z){
+Velocity vortexVelocity(int M, int N, int P, vector<double> X, vector<double> Y, vector<double> Z){
 
     vector<double> U;
     vector<double> V;
@@ -9,9 +9,9 @@ Velocity vortexVelocity(int M, int N, int P, vector<double> x, vector<double> y,
     for (int k = 0; k < P; ++k){
         for (int j = 0; j < N; ++j){
             for (int i = 0; i < M; ++i){
-                U.push_back(2*sin(PI*x[i])*sin(PI*x[i])*sin(2*PI*y[j])*sin(2*PI*z[k]));
-                V.push_back(-sin(2*PI*x[i])*sin(PI*y[j])*sin(PI*y[j])*sin(2*PI*x[k]));
-                W.push_back(-sin(2*PI*x[i])*sin(2*PI*y[j])*sin(PI*z[k])*sin(PI*z[k]));
+                U.push_back(2*sin(PI*X[i])*sin(PI*X[i])*sin(2*PI*Y[j])*sin(2*PI*Z[k]));
+                V.push_back(-sin(2*PI*X[i])*sin(PI*Y[j])*sin(PI*Y[j])*sin(2*PI*Z[k]));
+                W.push_back(-sin(2*PI*X[i])*sin(2*PI*Y[j])*sin(PI*Z[k])*sin(PI*Z[k]));
             }
         }
     }
