@@ -196,25 +196,6 @@ Derivative godunov(vector<double> &arr, vector<double> AX, vector<double> AY, ve
         for (int j = 0; j < N; ++j){
             for (int i = 0; i < M; ++i){
 
-                // if (i == 0 || i == (M-1)){
-                //     phix.push_back(1);
-                //     phiy.push_back(1);
-                //     phiz.push_back(1);
-                //     continue;
-                // }
-                // if (j == 0 || j == (N-1)){
-                //     phix.push_back(1);
-                //     phiy.push_back(1);
-                //     phiz.push_back(1);
-                //     continue;
-                // }
-                // if (k == 0 || k == (P-1)){
-                //     phix.push_back(1);
-                //     phiy.push_back(1);
-                //     phiz.push_back(1);
-                //     continue;
-                // }
-
                 if (i == 0 || i == (M-1) || j == 0 || j == (N-1) || k == 0 || k == (P-1) ){
                     phix.push_back(1.0);
                     phiy.push_back(1.0);
@@ -230,249 +211,6 @@ Derivative godunov(vector<double> &arr, vector<double> AX, vector<double> AY, ve
 
                 double phiz_m = (arr[i + j*N + k*P*P] - arr[i + j*N + (k-1)*P*P])/dz;
                 double phiz_p = (arr[i + j*N + (k+1)*P*P] - arr[i + j*N + k*P*P])/dz;
-
-                if (AX[i + j*N + k*P*P] >= 0){
-                    phix.push_back(sqrt(max(max(phix_m, 0.0)*max(phix_m, 0.0), min(phix_p, 0.0)*min(phix_p, 0.0))));
-                } else if (AX[i + j*N + k*P*P] < 0){
-                    phix.push_back(sqrt(max(min(phix_m, 0.0)*min(phix_m, 0.0), max(phix_p, 0.0)*max(phix_p, 0.0))));
-                }
-
-                if (AY[i + j*N + k*P*P] >= 0){
-                    phiy.push_back(sqrt(max(max(phiy_m, 0.0)*max(phiy_m, 0.0), min(phiy_p, 0.0)*min(phiy_p, 0.0))));
-                } else if (AY[i + j*N + k*P*P] < 0){
-                    phiy.push_back(sqrt(max(min(phiy_m, 0.0)*min(phiy_m, 0.0), max(phiy_p, 0.0)*max(phiy_p, 0.0))));
-                }
-
-                if (AZ[i + j*N + k*P*P] >= 0){
-                    phiz.push_back(sqrt(max(max(phiz_m, 0.0)*max(phiz_m, 0.0), min(phiz_p, 0.0)*min(phiz_p, 0.0))));
-                } else if (AZ[i + j*N + k*P*P] < 0){
-                    phiz.push_back(sqrt(max(min(phiz_m, 0.0)*min(phiz_m, 0.0), max(phiz_p, 0.0)*max(phiz_p, 0.0))));
-                }
-            }
-        }
-    }
-    return Derivative{phix, phiy, phiz};
-}
-
-Derivative godunov_subcell(vector<double> &arr, vector<double> AX, vector<double> AY, vector<double> AZ, vector<double> X, vector<double> Y, vector<double> Z, int M, int const N, int const P, double dx, double dy, double dz){
-
-    vector<double> phix;
-    vector<double> phiy;
-    vector<double> phiz;
-
-    for (int k = 0; k < P; ++k){
-        for (int j = 0; j < N; ++j){
-            for (int i = 0; i < M; ++i){
-
-                if (i==0 || i==(M-1) || i==1 || i==(M-2) || j==0 || j==(N-1) || j==1 || j==(N-2) || k==0 || k==(P-1) || k==1 || k==(P-2) ){
-                    phix.push_back(1.0);
-                    phiy.push_back(1.0);
-                    phiz.push_back(1.0);
-                    continue;
-                }
-
-                double phix_m, phix_p, phiy_m, phiy_p, phiz_m, phiz_p;
-
-                {
-                // x-direction
-                vector<double> xp;
-                vector<double> yp;
-
-                if ((X[i]*X[i+1] < 0) || (X[i-1]*X[i] < 0)){
-                    double f1_0_1 = (arr[(i-1)+j*N+k*P*P]-arr[(i)+j*N+k*P*P])/(X[i-1] - X[i]);
-                    double f1_1_2 = (arr[(i)+j*N+k*P*P]-arr[(i+1)+j*N+k*P*P])/(X[i] - X[i+1]);
-                    double f1_2_3 = (arr[(i+1)+j*N+k*P*P]-arr[(i+2)+j*N+k*P*P])/(X[i+1] - X[i+2]);
-                    double f2_0_1_2 = (f1_1_2 - f1_0_1)/(X[i+1] - X[i-1]);
-                    double f2_1_2_3 = (f1_2_3 - f1_1_2)/(X[i+2] - X[i]);
-                    double f3_0_1_2_3 = (f2_1_2_3 - f2_0_1_2)/(X[i+2] - X[i-1]);
-                    double x0 = arr[(i)+j*N+k*P*P] + f1_0_1*(-X[i-1]) + f2_0_1_2*(X[i-1]*X[i]) + f3_0_1_2_3*(-X[i-1]*X[i]*X[i+1]); //interface location
-
-                    if (x0 < X[i]){
-                        xp.push_back(X[i-1]);
-                        xp.push_back(x0);
-                        xp.push_back(X[i]);
-                        xp.push_back(X[i+1]);
-                        xp.push_back(X[i+2]);
-
-                        yp.push_back(arr[(i-1)+j*N+k*P*P]);
-                        yp.push_back(0);
-                        yp.push_back(arr[i+j*N+k*P*P]);
-                        yp.push_back(arr[(i+1)+j*N+k*P*P]);
-                        yp.push_back(arr[(i+2)+j*N+k*P*P]);
-                    } else {
-                        xp.push_back(X[i-2]);
-                        xp.push_back(X[i-1]);
-                        xp.push_back(X[i]);
-                        xp.push_back(x0);
-                        xp.push_back(X[i+1]);
-
-                        yp.push_back(arr[(i-2)+j*N+k*P*P]);
-                        yp.push_back(arr[(i-1)+j*N+k*P*P]);
-                        yp.push_back(arr[i+j*N+k*P*P]);
-                        yp.push_back(0);
-                        yp.push_back(arr[(i+1)+j*N+k*P*P]);   
-                    }
-                } else {
-                    xp.push_back(X[i-2]);
-                    xp.push_back(X[i-1]);
-                    xp.push_back(X[i]);
-                    xp.push_back(X[i+1]);
-                    xp.push_back(X[i+2]);
-
-                    yp.push_back(arr[(i-2)+j*N+k*P*P]);
-                    yp.push_back(arr[(i-1)+j*N+k*P*P]);
-                    yp.push_back(arr[i+j*N+k*P*P]);
-                    yp.push_back(arr[(i+1)+j*N+k*P*P]);
-                    yp.push_back(arr[(i+2)+j*N+k*P*P]);
-                }
-                vector<double> theta1;
-                vector<double> theta2;
-                for (int a = 0; a < 5; ++a){
-                    theta1.push_back((yp[a+1] - yp[a])/(xp[a+1] - xp[a]));
-                }
-                for (int a = 0; a < 4; ++a){
-                    theta2.push_back((theta1[a+1] - theta1[a])/(xp[a+2] - xp[a]));
-                }
-                double c_m = minMod(theta2[0], theta2[1]);
-                double c_p = minMod(theta2[1], theta2[2]);
-                double phix_m = theta1[1] + c_m*(xp[2] - xp[1]); // D_x^-phi_i 
-                double phix_p = theta1[2] + c_p*(xp[2] - xp[3]); // D_x^+phi_i
-                }
-
-                {                
-
-                // y-direction
-                vector<double> xp;
-                vector<double> yp;
-                if ((Y[j]*Y[j+1] < 0) || (Y[j-1]*Y[j] < 0)){
-                    double f1_0_1 = (arr[i+(j-1)*N+k*P*P]-arr[i+j*N+k*P*P])/(Y[j-1] - Y[j]);
-                    double f1_1_2 = (arr[i+j*N+k*P*P]-arr[i+(j+1)*N+k*P*P])/(Y[j] - Y[j+1]);
-                    double f1_2_3 = (arr[i+(j+1)*N+k*P*P]-arr[i+(j+2)*N+k*P*P])/(Y[j+1] - Y[j+2]);
-                    double f2_0_1_2 = (f1_1_2 - f1_0_1)/(Y[j+1] - Y[j-1]);
-                    double f2_1_2_3 = (f1_2_3 - f1_1_2)/(Y[j+2] - Y[j]);
-                    double f3_0_1_2_3 = (f2_1_2_3 - f2_0_1_2)/(Y[j+2] - Y[j-1]);
-                    double x0 = arr[i+j*N+k*P*P] + f1_0_1*(-Y[j-1]) + f2_0_1_2*(Y[j-1]*Y[j]) + f3_0_1_2_3*(-Y[j-1]*Y[j]*Y[j+1]); //interface location
-
-                    if (x0 < Y[j]){
-                        xp.push_back(Y[j-1]);
-                        xp.push_back(x0);
-                        xp.push_back(Y[j]);
-                        xp.push_back(Y[j+1]);
-                        xp.push_back(Y[j+2]);
-
-                        yp.push_back(arr[i+(j-1)*N+k*P*P]);
-                        yp.push_back(0);
-                        yp.push_back(arr[i+j*N+k*P*P]);
-                        yp.push_back(arr[i+(j+1)*N+k*P*P]);
-                        yp.push_back(arr[i+(j+2)*N+k*P*P]);
-                    } else {
-                        xp.push_back(Y[j-2]);
-                        xp.push_back(Y[j-1]);
-                        xp.push_back(Y[j]);
-                        xp.push_back(x0);
-                        xp.push_back(Y[j+1]);
-
-                        yp.push_back(arr[i+(j-2)*N+k*P*P]);
-                        yp.push_back(arr[i+(j-1)*N+k*P*P]);
-                        yp.push_back(arr[i+j*N+k*P*P]);
-                        yp.push_back(0);
-                        yp.push_back(arr[i+(j+1)*N+k*P*P]);   
-                    }
-                } else {
-                    xp.push_back(Y[j-2]);
-                    xp.push_back(Y[j-1]);
-                    xp.push_back(Y[j]);
-                    xp.push_back(Y[j+1]);
-                    xp.push_back(Y[j+2]);
-
-                    yp.push_back(arr[i+(j-2)*N+k*P*P]);
-                    yp.push_back(arr[i+(j-1)*N+k*P*P]);
-                    yp.push_back(arr[i+j*N+k*P*P]);
-                    yp.push_back(arr[i+(j+1)*N+k*P*P]);
-                    yp.push_back(arr[i+(j+2)*N+k*P*P]);
-                }
-                vector<double> theta1;
-                vector<double> theta2;
-                for (int a = 0; a < 5; ++a){
-                    theta1.push_back((yp[a+1] - yp[a])/(xp[a+1] - xp[a]));
-                }
-                for (int a = 0; a < 4; ++a){
-                    theta2.push_back((theta1[a+1] - theta1[a])/(xp[a+2] - xp[a]));
-                }
-                double c_m = minMod(theta2[0], theta2[1]);
-                double c_p = minMod(theta2[1], theta2[2]);
-                double phiy_m = theta1[1] + c_m*(xp[2] - xp[1]); // D_y^-phi_j 
-                double phiy_p = theta1[2] + c_p*(xp[2] - xp[3]); // D_y^+phi_j
-
-                }
-
-                {
-                // z-direction
-
-                vector<double> xp;
-                vector<double> yp;
-
-                if ((Z[k]*Z[k+1] < 0) || (Z[k-1]*Z[k] < 0)){
-                    double f1_0_1 = (arr[i+j*N+(k-1)*P*P]-arr[i+j*N+k*P*P])/(Z[k-1] - Z[k]);
-                    double f1_1_2 = (arr[i+j*N+k*P*P]-arr[i+j*N+(k+1)*P*P])/(Z[k] - Z[k+1]);
-                    double f1_2_3 = (arr[i+j*N+(k+1)*P*P]-arr[i+j*N+(k+2)*P*P])/(Z[k+1] - Z[k+2]);
-                    double f2_0_1_2 = (f1_1_2 - f1_0_1)/(Z[k+1] - Z[k-1]);
-                    double f2_1_2_3 = (f1_2_3 - f1_1_2)/(Z[k+2] - Z[k]);
-                    double f3_0_1_2_3 = (f2_1_2_3 - f2_0_1_2)/(Z[k+2] - Z[k-1]);
-                    double x0 = arr[i+j*N+k*P*P] + f1_0_1*(-Z[k-1]) + f2_0_1_2*(Z[k-1]*Z[k]) + f3_0_1_2_3*(-Z[k-1]*Z[k]*Z[k+1]); //interface location
-
-                    if (x0 < Z[k]){
-                        xp.push_back(Z[k-1]);
-                        xp.push_back(x0);
-                        xp.push_back(Z[k]);
-                        xp.push_back(Z[k+1]);
-                        xp.push_back(Z[k+2]);
-
-                        yp.push_back(arr[i+j*N+(k-1)*P*P]);
-                        yp.push_back(0);
-                        yp.push_back(arr[i+j*N+k*P*P]);
-                        yp.push_back(arr[i+j*N+(k+1)*P*P]);
-                        yp.push_back(arr[i+j*N+(k+2)*P*P]);
-                    } else {
-                        xp.push_back(Z[k-2]);
-                        xp.push_back(Z[k-1]);
-                        xp.push_back(Z[k]);
-                        xp.push_back(x0);
-                        xp.push_back(Z[k+1]);
-
-                        yp.push_back(arr[i+j*N+(k-2)*P*P]);
-                        yp.push_back(arr[i+j*N+(k-1)*P*P]);
-                        yp.push_back(arr[i+j*N+k*P*P]);
-                        yp.push_back(0);
-                        yp.push_back(arr[i+j*N+(k+1)*P*P]);   
-                    }
-                } else {
-                    xp.push_back(Z[k-2]);
-                    xp.push_back(Z[k-1]);
-                    xp.push_back(Z[k]);
-                    xp.push_back(Z[k+1]);
-                    xp.push_back(Z[k+2]);
-
-                    yp.push_back(arr[i+j*N+(k-2)*P*P]);
-                    yp.push_back(arr[i+j*N+(k-1)*P*P]);
-                    yp.push_back(arr[i+j*N+k*P*P]);
-                    yp.push_back(arr[i+j*N+(k+1)*P*P]);
-                    yp.push_back(arr[i+j*N+(k+2)*P*P]);
-                }
-                vector<double> theta1;
-                vector<double> theta2;
-                for (int a = 0; a < 5; ++a){
-                    theta1.push_back((yp[a+1] - yp[a])/(xp[a+1] - xp[a]));
-                }
-                for (int a = 0; a < 4; ++a){
-                    theta2.push_back((theta1[a+1] - theta1[a])/(xp[a+2] - xp[a]));
-                }
-                double c_m = minMod(theta2[0], theta2[1]);
-                double c_p = minMod(theta2[1], theta2[2]);
-                double phiz_m = theta1[1] + c_m*(xp[2] - xp[1]); // D_z^-phi_i 
-                double phiz_p = theta1[2] + c_p*(xp[2] - xp[3]); // D_z^+phi_i
-                
-                }
 
                 if (AX[i + j*N + k*P*P] >= 0){
                     phix.push_back(sqrt(max(max(phix_m, 0.0)*max(phix_m, 0.0), min(phix_p, 0.0)*min(phix_p, 0.0))));
@@ -640,29 +378,35 @@ void euler_weno(vector<double> &arr, vector<double> AX, vector<double> AY, vecto
     }
 }
 
-void TVDRK3_godunov_reinit(vector<double> &arr, vector<double> X, vector<double> Y, vector<double> Z, int M, int N, int P, double dx, double dy, double dz, double dt){
+void TVDRK3_godunov_reinit(vector<double> &arr, vector<double> X, vector<double> Y, vector<double> Z, int M, int N, int P, double dx, double dy, double dz, double dt, vector<double> phi0){
 
     vector<double> n1;
     vector<double> n2;
     vector<double> n3_2;
 
-    vector<double> S = arr/(vectorSqrt(arr*arr + max(max(dx,dy),dz)*max(max(dx,dy),dz)));
+    vector<double> S = phi0/(vectorSqrt(phi0*phi0 + max(max(dx,dy),dz)*max(max(dx,dy),dz)));
 
     {
-        auto [phix, phiy, phiz] = godunov_subcell(arr, S, S, S, X, Y, Z, M, N, P, dx, dy, dz);
-        n1 =  arr - dt*S*(vectorCBRT(phix*phix*phix + phiy*phiy*phiy + phiz*phiz*phiz) - 1.0);
+        // auto [phix, phiy, phiz] = godunov(arr, S, S, S, M, N, P, dx, dy, dz);
+        auto [phix, phiy, phiz] = fourth_order_reinit(arr, S, S, S, X, Y, Z, M, N, P, dx, dy, dz, phi0);
+        // n1 =  arr - dt*S*(vectorCBRT(phix*phix*phix + phiy*phiy*phiy + phiz*phiz*phiz) - 1.0);// feil her?
+        n1 =  arr - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0);// feil her?
     }
 
     {
-        auto [phix, phiy, phiz] = godunov_subcell(n1, S, S, S, X, Y, Z, M, N, P, dx, dy, dz);
-        n2 =  n1 - dt*S*(vectorCBRT(phix*phix*phix + phiy*phiy*phiy + phiz*phiz*phiz) - 1.0);
+        // auto [phix, phiy, phiz] = godunov(n1, S, S, S, M, N, P, dx, dy, dz);
+        auto [phix, phiy, phiz] = fourth_order_reinit(n1, S, S, S, X, Y, Z, M, N, P, dx, dy, dz, phi0);
+        // n2 =  n1 - dt*S*(vectorCBRT(phix*phix*phix + phiy*phiy*phiy + phiz*phiz*phiz) - 1.0);// feil her?
+        n2 =  n1 - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0);// feil her?
     }
 
     vector<double> n1_2 = (3.0/4*arr + 1.0/4*n2);
 
     {
-        auto [phix, phiy, phiz] = godunov_subcell(n1_2, S, S, S, X, Y, Z, M, N, P, dx, dy, dz);
-        n3_2 =  n1_2 - dt*S*(vectorCBRT(phix*phix*phix + phiy*phiy*phiy + phiz*phiz*phiz) - 1.0);
+        // auto [phix, phiy, phiz] = godunov(n1_2, S, S, S, M, N, P, dx, dy, dz);
+        auto [phix, phiy, phiz] = fourth_order_reinit(n1_2, S, S, S, X, Y, Z, M, N, P, dx, dy, dz, phi0);
+        // n3_2 =  n1_2 - dt*S*(vectorCBRT(phix*phix*phix + phiy*phiy*phiy + phiz*phiz*phiz) - 1.0); // feil her?
+        n3_2 =  n1_2 - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0); // feil her?
     }
 
     arr = 1.0/3*arr + 2.0/3*n3_2;
@@ -753,57 +497,6 @@ void euler_upwind_reinit(vector<double> &arr, int M, int N, int P, double dx, do
         }
     }
     arr = phi;
-}
-
-void fourth_Order_Reinit(vector<double> &arr, int M, int N, int P, double dx, double dy, double dz, double dt, const vector<double> &phi0){ // Not complete
-    for (int k = 0; k < P; ++k){
-        for (int j = 0; j < N; ++j){
-            for (int i = 0; i < M; ++i){
-                if (i==0 || i==(M-1) || j==0 || j==(N-1) || k==0 || k==(P-1)){
-                    continue;
-                }
-                vector<double> D1x;
-                vector<double> D1y;
-                vector<double> D1z;
-                vector<double> D2x;
-                vector<double> D2y;
-                vector<double> D2z;
-                vector<double> D3x;
-                vector<double> D3y;
-                vector<double> D3z;
-    
-                for (int k = -3; k <= 2; ++k){
-                    D1x.push_back((arr[(i+1)+j*N+k*P*P] - arr[i+j*N+k*P*P])/dx);
-                    D1y.push_back((arr[i+(j+1)*N+k*P*P] - arr[i+j*N+k*P*P])/dy);
-                    D1z.push_back((arr[i+j*N+(k+1)*P*P] - arr[i+j*N+k*P*P])/dz);
-                }
-                for (int k = 0; k <= 5; ++k){
-                    D2x.push_back((D1x[k+1] - D1x[k])/(2*dx));
-                    D2y.push_back((D1y[k+1] - D1y[k])/(2*dy));
-                    D2z.push_back((D1z[k+1] - D1z[k])/(2*dz));
-                }
-                for (int k = 0; k <= 4; ++k){
-                    D3x.push_back((D2x[k+1] - D2x[k])/(3*dx));
-                    D3y.push_back((D2y[k+1] - D2y[k])/(3*dy));
-                    D3z.push_back((D2z[k+1] - D2z[k])/(3*dz));
-                }
-
-                double a, b;
-                if (abs(D2x[1]) < abs(D2x[0])){
-                    a = dx*2*dx*minAbs(D3x[1], D3x[0]);
-                } else {
-                    a = dx*(-dx)*minAbs(D3x[1], D3x[2]);
-                }
-                if (abs(D2x[2]) < abs(D2x[3])){
-                    b = dx*(-dx)*minAbs(D3x[1], D3x[2]);
-                } else {
-                    b = (-dx)*(-2*dx)*minAbs(D3x[2], D3x[3]);
-                }
-                double Dxm = D1x[2] + minMod(D2x[1], D2x[2])*dx + a;
-                double Dxp = D1x[3] + minMod(D2x[2], D2x[3])*(-dx) + b;
-            }
-        }
-    }
 }
 
 void second_Order_Reinit(vector<double> &arr, vector<double> X, vector<double> Y, vector<double> Z, int M, int N, int P, double dx, double dy, double dz, double dt, const vector<double> &phi0){
@@ -1079,3 +772,461 @@ double minMod(double a, double b){
     return res;
 }
 
+double interfaceInterpolation(double xm2, double xm1, double x1, double x2, double phim2, double phim1, double phi1, double phi2){
+    Eigen::Matrix4d A;
+    Eigen::Vector4d b;
+    A << pow(phim2, 3), pow(phim2, 2), phim2, 1,
+        pow(phim1, 3), pow(phim1, 2), phim1, 1,
+        pow(phi1, 3), pow(phi1, 2), phi1, 1,
+        pow(phi2, 3), pow(phi2, 2), phi2, 1;
+    b << xm2, xm1, x1, x2;
+    Eigen::Vector4d x = A.colPivHouseholderQr().solve(b);
+    return x[3];
+}
+
+Derivative fourth_order_reinit(vector<double> &arr, vector<double> AX, vector<double> AY, vector<double> AZ, vector<double> X, vector<double> Y, vector<double> Z, int M, int N, int P, double dx, double dy, double dz, const vector<double> &phi0){
+    vector<double> phix;
+    vector<double> phiy;
+    vector<double> phiz;
+    for (int k = 0; k < P; ++k){
+        for (int j = 0; j < N; ++j){
+            for (int i = 0; i < M; ++i){
+                if (i==0 || i==1 || i==(M-1) || i==(M-2) || i==2 || i==(M-3) || i==3 || i==(M-4) ||
+                     j==0 || j==1 || j==(N-1) || j==(N-2) || j==2 || j==(N-3) || j==3 || j==(N-4) ||
+                     k==0 || k==1 || k==(P-1) || k==(P-2) || k==2 || k==(P-3) || k==3 || k==(P-4)){
+                    // phi.push_back(arr[i+j*N+k*P*P]);
+                    phix.push_back(1.0);
+                    phiy.push_back(1.0);
+                    phiz.push_back(1.0);
+                    continue;
+                }
+
+                double phix_m;
+                double phix_p;
+                double phiy_m;
+                double phiy_p;
+                double phiz_m;
+                double phiz_p;
+                
+                // x-direction
+                // if grid node is next to interface
+                if (arr[i+j*N+k*P*P]*arr[(i+1)+j*N+k*P*P] < 0 || arr[i+j*N+k*P*P]*arr[(i-1)+j*N+k*P*P] < 0){
+                    vector<double> xp;
+                    vector<double> fp;
+                    if (arr[i+j*N+k*P*P]*arr[(i+1)+j*N+k*P*P] < 0){
+                        double x0 = interfaceInterpolation(X[i-1], X[i], X[i+1], X[i+2], arr[(i-1)+j*N+k*P*P], arr[i+j*N+k*P*P], arr[(i+1)+j*N+k*P*P], arr[(i+2)+j*N+k*P*P]);
+                        
+                        if (x0 == X[i]){
+                            x0 = x0 + dx/100.0;
+                        }
+                        
+                        xp.push_back(X[i-3]);
+                        xp.push_back(X[i-2]);
+                        xp.push_back(X[i-1]);
+                        xp.push_back(X[i]);
+                        xp.push_back(x0);
+                        xp.push_back(X[i+1]);
+                        xp.push_back(X[i+2]);
+                        fp.push_back(arr[(i-3)+j*N+k*P*P]);
+                        fp.push_back(arr[(i-2)+j*N+k*P*P]);
+                        fp.push_back(arr[(i-1)+j*N+k*P*P]);
+                        fp.push_back(arr[i+j*N+k*P*P]);
+                        fp.push_back(0);
+                        fp.push_back(arr[(i+1)+j*N+k*P*P]);
+                        fp.push_back(arr[(i+2)+j*N+k*P*P]);
+                    } else if (arr[i+j*N+k*P*P]*arr[(i-1)+j*N+k*P*P] < 0){
+                        double x0 = interfaceInterpolation(X[i-2], X[i-1], X[i], X[i+1], arr[(i-2)+j*N+k*P*P], arr[(i-1)+j*N+k*P*P], arr[i+j*N+k*P*P], arr[(i+1)+j*N+k*P*P]);
+                        
+                        if (x0 == X[i]){
+                            x0 = x0 - dx/100.0;
+                        }
+                        
+                        xp.push_back(X[i-2]);
+                        xp.push_back(X[i-1]);
+                        xp.push_back(x0);
+                        xp.push_back(X[i]);
+                        xp.push_back(X[i+1]);
+                        xp.push_back(X[i+2]);
+                        xp.push_back(X[i+3]);
+                        fp.push_back(arr[(i-2)+j*N+k*P*P]);
+                        fp.push_back(arr[(i-1)+j*N+k*P*P]);
+                        fp.push_back(0);
+                        fp.push_back(arr[i+j*N+k*P*P]);
+                        fp.push_back(arr[(i+1)+j*N+k*P*P]);
+                        fp.push_back(arr[(i+2)+j*N+k*P*P]);
+                        fp.push_back(arr[(i+3)+j*N+k*P*P]);
+                    }
+                    vector<double> D1;
+                    vector<double> D2;
+                    vector<double> D3;
+                    for (int h = 0; h < 7; ++h){
+                        D1.push_back((fp[h+1] - fp[h])/(xp[h+1] - xp[h]));
+                    }
+                    for (int h = 0; h < 6; ++h){
+                        D2.push_back((D1[h+1] - D1[h])/(xp[h+2] - xp[h]));
+                    }
+                    for (int h = 0; h < 5; ++h){
+                        D3.push_back((D2[h+1] - D2[h])/(xp[h+3] - xp[h]));
+                    }
+                    double a;
+                    double b;
+                    if (abs(D2[1]) < abs(D2[2])){
+                        a = (X[i] - X[i-1])*(X[i] - X[i-2])*minAbs(D3[1], D3[0]);
+                    } else {
+                        a = (X[i] - X[i-1])*(X[i] - X[i+1])*minAbs(D3[1], D3[2]);
+                    }
+                    if (abs(D2[2]) < abs(D2[3])){
+                        b = (X[i] - X[i-1])*(X[i] - X[i+1])*minAbs(D3[1], D3[2]);
+                    } else {
+                        b = (X[i] - X[i+1])*(X[i] - X[i+2])*minAbs(D3[2], D3[3]);
+                    }
+                    phix_m = D1[2] + minMod(D2[1], D2[2])*(X[i] - X[i-1]) + a;
+                    phix_p = D1[3] + minMod(D2[2], D2[3])*(X[i] - X[i+1]) + b;
+
+                    if (isnan(phix_m)){
+                        cout << "nan";
+                    }
+                    if (isnan(phix_p)){
+                        cout << "nan";
+                    }
+
+                } else { // WENO
+
+                    double v1;
+                    double v2;
+                    double v3;
+                    double v4;
+                    double v5;                
+
+                    if (AX[i + j*N + k*P*P] >= 0){
+                        v1 = (arr[(i-2) + j*N + k*P*P] - arr[(i-3) + j*N + k*P*P])/dx;
+                        v2 = (arr[(i-1) + j*N + k*P*P] - arr[(i-2) + j*N + k*P*P])/dx;
+                        v3 = (arr[(i) + j*N + k*P*P] - arr[(i-1) + j*N + k*P*P])/dx;
+                        v4 = (arr[(i+1) + j*N + k*P*P] - arr[(i) + j*N + k*P*P])/dx;
+                        v5 = (arr[(i+2) + j*N + k*P*P] - arr[(i+1) + j*N + k*P*P])/dx;
+                    } else if (AX[i + j*N + k*P*P] < 0){
+                        v1 = (arr[(i-1) + j*N + k*P*P] - arr[(i-2) + j*N + k*P*P])/dx;
+                        v2 = (arr[(i) + j*N + k*P*P] - arr[(i-1) + j*N + k*P*P])/dx;
+                        v3 = (arr[(i+1) + j*N + k*P*P] - arr[(i) + j*N + k*P*P])/dx;
+                        v4 = (arr[(i+2) + j*N + k*P*P] - arr[(i+1) + j*N + k*P*P])/dx;
+                        v5 = (arr[(i+3) + j*N + k*P*P] - arr[(i+2) + j*N + k*P*P])/dx;
+                    }
+                    double S1 = 13/12*(v1 - 2*v2 + v3)*(v1 - 2*v2 + v3) + 1/4*(v1 - 4*v2 + v3)*(v1 - 4*v2 + v3);
+                    double S2 = 13/12*(v2 - 2*v3 + v4)*(v2 - 2*v3 + v4) + 1/4*(v2 - v4)*(v2 - v4);
+                    double S3 = 13/12*(v3 - 2*v4 + v5)*(v3 - 2*v4 + v5) + 1/4*(3*v3 - 4*v4 + v5)*(3*v3 - 4*v4 + v5);
+
+                    double epsilon = pow(10, -6)*max(max(max(max(v1*v1, v2*v2), v3*v3), v4*v4), v5*v5) + pow(10, -99);
+
+                    double alpha1 = 0.1/((S1 + epsilon)*(S1 + epsilon));
+                    double alpha2 = 0.6/((S2 + epsilon)*(S2 + epsilon));
+                    double alpha3 = 0.3/((S3 + epsilon)*(S3 + epsilon));
+
+                    double omega1 = alpha1/(alpha1 + alpha2 + alpha3);
+                    double omega2 = alpha2/(alpha1 + alpha2 + alpha3);
+                    double omega3 = alpha3/(alpha1 + alpha2 + alpha3);
+
+                    double phix1 = v1/3 - 7*v2/6 + 11*v3/6;
+                    double phix2 = -v2/6 + 5*v3/6 + v4/3;
+                    double phix3 = v3/3 + 5*v4/6 - v5/6;
+
+                    phix_m = omega1*phix1 + omega2*phix2 + omega3*phix3;
+                    phix_p = omega1*phix1 + omega2*phix2 + omega3*phix3;
+
+                    if (isnan(phix_m)){
+                        cout << "nan";
+                    }
+                    if (isnan(phix_p)){
+                        cout << "nan";
+                    }
+
+                }
+
+                // y-direction
+                // if grid node is next to interface
+                if (arr[i+j*N+k*P*P]*arr[i+(j+1)*N+k*P*P] < 0 || arr[i+j*N+k*P*P]*arr[i+(j-1)*N+k*P*P] < 0){
+                    vector<double> xp;
+                    vector<double> fp;
+                    if (arr[i+j*N+k*P*P]*arr[i+(j+1)*N+k*P*P] < 0){
+                        double x0 = interfaceInterpolation(Y[j-1], Y[j], Y[j+1], Y[j+2], arr[i+(j-1)*N+k*P*P], arr[i+j*N+k*P*P], arr[i+(j+1)*N+k*P*P], arr[i+(j+2)*N+k*P*P]);
+                        
+                        if (x0 == Y[j]){
+                            x0 = x0 + dy/100.0;
+                        }
+                        
+                        xp.push_back(Y[j-3]);
+                        xp.push_back(Y[j-2]);
+                        xp.push_back(Y[j-1]);
+                        xp.push_back(Y[j]);
+                        xp.push_back(x0);
+                        xp.push_back(Y[j+1]);
+                        xp.push_back(Y[j+2]);
+                        fp.push_back(arr[i+(j-3)*N+k*P*P]);
+                        fp.push_back(arr[i+(j-2)*N+k*P*P]);
+                        fp.push_back(arr[i+(j-1)*N+k*P*P]);
+                        fp.push_back(arr[i+j*N+k*P*P]);
+                        fp.push_back(0);
+                        fp.push_back(arr[i+(j+1)*N+k*P*P]);
+                        fp.push_back(arr[i+(j+2)*N+k*P*P]);
+                    } else if (arr[i+j*N+k*P*P]*arr[i+(j-1)*N+k*P*P] < 0){
+                        double x0 = interfaceInterpolation(Y[j-2], Y[j-1], Y[j], Y[j+1], arr[i+(j-2)*N+k*P*P], arr[i+(j-1)*N+k*P*P], arr[i+j*N+k*P*P], arr[i+(j+1)*N+k*P*P]);
+                        
+                        if (x0 == Y[j]){
+                            x0 = x0 - dy/100.0;
+                        }
+                        
+                        xp.push_back(Y[j-2]);
+                        xp.push_back(Y[j-1]);
+                        xp.push_back(x0);
+                        xp.push_back(Y[j]);
+                        xp.push_back(Y[j+1]);
+                        xp.push_back(Y[j+2]);
+                        xp.push_back(Y[j+3]);
+                        fp.push_back(arr[i+(j-2)*N+k*P*P]);
+                        fp.push_back(arr[i+(j-1)*N+k*P*P]);
+                        fp.push_back(0);
+                        fp.push_back(arr[i+j*N+k*P*P]);
+                        fp.push_back(arr[i+(j+1)*N+k*P*P]);
+                        fp.push_back(arr[i+(j+2)*N+k*P*P]);
+                        fp.push_back(arr[i+(j+3)*N+k*P*P]);
+                    }
+                    vector<double> D1;
+                    vector<double> D2;
+                    vector<double> D3;
+                    for (int h = 0; h < 7; ++h){
+                        D1.push_back((fp[h+1] - fp[h])/(xp[h+1] - xp[h]));
+                    }
+                    for (int h = 0; h < 6; ++h){
+                        D2.push_back((D1[h+1] - D1[h])/(xp[h+2] - xp[h]));
+                    }
+                    for (int h = 0; h < 5; ++h){
+                        D3.push_back((D2[h+1] - D2[h])/(xp[h+3] - xp[h]));
+                    }
+                    double a;
+                    double b;
+                    if (abs(D2[1]) < abs(D2[2])){
+                        a = (Y[j] - Y[j-1])*(Y[j] - Y[j-2])*minAbs(D3[1], D3[0]);
+                    } else {
+                        a = (Y[j] - Y[j-1])*(Y[j] - Y[j+1])*minAbs(D3[1], D3[2]);
+                    }
+                    if (abs(D2[2]) < abs(D2[3])){
+                        b = (Y[j] - Y[j-1])*(Y[j] - Y[j+1])*minAbs(D3[1], D3[2]);
+                    } else {
+                        b = (Y[j] - Y[j+1])*(Y[j] - Y[j+2])*minAbs(D3[2], D3[3]);
+                    }
+                    phiy_m = D1[2] + minMod(D2[1], D2[2])*(Y[j] - Y[j-1]) + a;
+                    phiy_p = D1[3] + minMod(D2[2], D2[3])*(Y[j] - Y[j+1]) + b;
+
+                    if (isnan(phiy_m)){
+                        cout << "nan";
+                    }
+                    if (isnan(phiy_p)){
+                        cout << "nan";
+                    }
+
+                } else { // WENO
+                    
+                    double v1;
+                    double v2;
+                    double v3;
+                    double v4;
+                    double v5;
+
+                    if (AY[i + j*N + k*P*P] >= 0){
+                        v1 = (arr[i + (j-2)*N + k*P*P] - arr[i + (j-3)*N + k*P*P])/dy;
+                        v2 = (arr[i + (j-1)*N + k*P*P] - arr[i + (j-2)*N + k*P*P])/dy;
+                        v3 = (arr[i + j*N + k*P*P] - arr[i + (j-1)*N + k*P*P])/dy;
+                        v4 = (arr[i + (j+1)*N + k*P*P] - arr[i + j*N + k*P*P])/dy;
+                        v5 = (arr[i + (j+2)*N + k*P*P] - arr[i + (j+1)*N + k*P*P])/dy;
+                    } else if (AY[i + j*N + k*P*P] < 0){
+                        v1 = (arr[i + (j-1)*N + k*P*P] - arr[i + (j-2)*N + k*P*P])/dy;
+                        v2 = (arr[i + j*N + k*P*P] - arr[i + (j-1)*N + k*P*P])/dy;
+                        v3 = (arr[i + (j+1)*N + k*P*P] - arr[i + j*N + k*P*P])/dy;
+                        v4 = (arr[i + (j+2)*N + k*P*P] - arr[i + (j+1)*N + k*P*P])/dy;
+                        v5 = (arr[i + (j+3)*N + k*P*P] - arr[i + (j+2)*N + k*P*P])/dy;
+                    }
+                    double S1 = 13/12*(v1 - 2*v2 + v3)*(v1 - 2*v2 + v3) + 1/4*(v1 - 4*v2 + v3)*(v1 - 4*v2 + v3);
+                    double S2 = 13/12*(v2 - 2*v3 + v4)*(v2 - 2*v3 + v4) + 1/4*(v2 - v4)*(v2 - v4);
+                    double S3 = 13/12*(v3 - 2*v4 + v5)*(v3 - 2*v4 + v5) + 1/4*(3*v3 - 4*v4 + v5)*(3*v3 - 4*v4 + v5);
+
+                    double epsilon = pow(10, -6)*max(max(max(max(v1*v1, v2*v2), v3*v3), v4*v4), v5*v5) + pow(10, -99);
+
+                    double alpha1 = 0.1/((S1 + epsilon)*(S1 + epsilon));
+                    double alpha2 = 0.6/((S2 + epsilon)*(S2 + epsilon));
+                    double alpha3 = 0.3/((S3 + epsilon)*(S3 + epsilon));
+
+                    double omega1 = alpha1/(alpha1 + alpha2 + alpha3);
+                    double omega2 = alpha2/(alpha1 + alpha2 + alpha3);
+                    double omega3 = alpha3/(alpha1 + alpha2 + alpha3);
+
+                    double phiy1 = v1/3 - 7*v2/6 + 11*v3/6;
+                    double phiy2 = -v2/6 + 5*v3/6 + v4/3;
+                    double phiy3 = v3/3 + 5*v4/6 - v5/6;
+
+                    phiy_m = omega1*phiy1 + omega2*phiy2 + omega3*phiy3;
+                    phiy_p = omega1*phiy1 + omega2*phiy2 + omega3*phiy3;
+
+                    if (isnan(phiy_m)){
+                        cout << "nan";
+                    }
+                    if (isnan(phiy_p)){
+                        cout << "nan";
+                    }
+
+                }
+
+                // z-direction
+                // if grid node is next to interface
+                if (arr[i+j*N+k*P*P]*arr[i+j*N+(k+1)*P*P] < 0 || arr[i+j*N+k*P*P]*arr[i+j*N+(k-1)*P*P] < 0){
+                    vector<double> xp;
+                    vector<double> fp;
+                    if (arr[i+j*N+k*P*P]*arr[i+j*N+(k+1)*P*P] < 0){
+                        double x0 = interfaceInterpolation(Z[k-1], Z[k], Z[k+1], Z[k+2], arr[i+j*N+(k-1)*P*P], arr[i+j*N+k*P*P], arr[i+j*N+(k+1)*P*P], arr[i+j*N+(k+2)*P*P]);
+                        
+                        if (x0 == Z[k]){
+                            x0 = x0 + dz/100.0;
+                        }
+                        
+                        xp.push_back(Z[k-3]);
+                        xp.push_back(Z[k-2]);
+                        xp.push_back(Z[k-1]);
+                        xp.push_back(Z[k]);
+                        xp.push_back(x0);
+                        xp.push_back(Z[k+1]);
+                        xp.push_back(Z[k+2]);
+                        fp.push_back(arr[i+j*N+(k-3)*P*P]);
+                        fp.push_back(arr[i+j*N+(k-2)*P*P]);
+                        fp.push_back(arr[i+j*N+(k-1)*P*P]);
+                        fp.push_back(arr[i+j*N+k*P*P]);
+                        fp.push_back(0);
+                        fp.push_back(arr[i+j*N+(k+1)*P*P]);
+                        fp.push_back(arr[i+j*N+(k+2)*P*P]);
+
+                    } else if (arr[i+j*N+k*P*P]*arr[i+j*N+(k-1)*P*P] < 0){
+                        double x0 = interfaceInterpolation(Z[k-2], Z[k-1], Z[k], Z[k+1], arr[i+j*N+(k-2)*P*P], arr[i+j*N+(k-1)*P*P], arr[i+j*N+k*P*P], arr[i+j*N+(k+1)*P*P]);
+                        
+                        if (x0 == Z[k]){
+                            x0 = x0 - dz/100.0;
+                        }
+
+                        xp.push_back(Z[k-2]);
+                        xp.push_back(Z[k-1]);
+                        xp.push_back(x0);
+                        xp.push_back(Z[k]);
+                        xp.push_back(Z[k+1]);
+                        xp.push_back(Z[k+2]);
+                        xp.push_back(Z[k+3]);
+                        fp.push_back(arr[i+j*N+(k-2)*P*P]);
+                        fp.push_back(arr[i+j*N+(k-1)*P*P]);
+                        fp.push_back(0);
+                        fp.push_back(arr[i+j*N+k*P*P]);
+                        fp.push_back(arr[i+j*N+(k+1)*P*P]);
+                        fp.push_back(arr[i+j*N+(k+2)*P*P]);
+                        fp.push_back(arr[i+j*N+(k+3)*P*P]);
+                    }
+                    vector<double> D1;
+                    vector<double> D2;
+                    vector<double> D3;
+                    for (int h = 0; h < 7; ++h){
+                        D1.push_back((fp[h+1] - fp[h])/(xp[h+1] - xp[h]));
+                    }
+                    for (int h = 0; h < 6; ++h){
+                        D2.push_back((D1[h+1] - D1[h])/(xp[h+2] - xp[h]));
+                    }
+                    for (int h = 0; h < 5; ++h){
+                        D3.push_back((D2[h+1] - D2[h])/(xp[h+3] - xp[h]));
+                    }
+                    double a;
+                    double b;
+                    if (abs(D2[1]) < abs(D2[2])){
+                        a = (Z[k] - Z[k-1])*(Z[k] - Z[k-2])*minAbs(D3[1], D3[0]);
+                    } else {
+                        a = (Z[k] - Z[k-1])*(Z[k] - Z[k+1])*minAbs(D3[1], D3[2]);
+                    }
+                    if (abs(D2[2]) < abs(D2[3])){
+                        b = (Z[k] - Z[k-1])*(Z[k] - Z[k+1])*minAbs(D3[1], D3[2]);
+                    } else {
+                        b = (Z[k] - Z[k+1])*(Z[k] - Z[k+2])*minAbs(D3[2], D3[3]);
+                    }
+                    phiz_m = D1[2] + minMod(D2[1], D2[2])*(Z[k] - Z[k-1]) + a;
+                    phiz_p = D1[3] + minMod(D2[2], D2[3])*(Z[k] - Z[k+1]) + b;
+
+                    if (isnan(phiz_m)){
+                        cout << "nan";
+                    }
+                    if (isnan(phiz_p)){
+                        cout << "nan";
+                    }
+
+                } else { // WENO
+                
+                    double v1;
+                    double v2;
+                    double v3;
+                    double v4;
+                    double v5;
+                    
+                    if (AZ[i + j*N + k*P*P] >= 0){
+                        v1 = (arr[i + j*N + (k-2)*P*P] - arr[i + j*N + (k-3)*P*P])/dz;
+                        v2 = (arr[i + j*N + (k-1)*P*P] - arr[i + j*N + (k-2)*P*P])/dz;
+                        v3 = (arr[i + j*N + k*P*P] - arr[i + j*N + (k-1)*P*P])/dz;
+                        v4 = (arr[i + j*N + (k+1)*P*P] - arr[i + j*N + k*P*P])/dz;
+                        v5 = (arr[i + j*N + (k+2)*P*P] - arr[i + j*N + (k+1)*P*P])/dz;
+                    } else if (AZ[i + j*N + k*P*P] < 0){
+                        v1 = (arr[i + j*N + (k-1)*P*P] - arr[i + j*N + (k-2)*P*P])/dz;
+                        v2 = (arr[i + j*N + k*P*P] - arr[i + j*N + (k-1)*P*P])/dz;
+                        v3 = (arr[i + j*N + (k+1)*P*P] - arr[i + j*N + k*P*P])/dz;
+                        v4 = (arr[i + j*N + (k+2)*P*P] - arr[i + j*N + (k+1)*P*P])/dz;
+                        v5 = (arr[i + j*N + (k+3)*P*P] - arr[i + j*N + (k+2)*P*P])/dz;
+                    }
+                    double S1 = 13/12*(v1 - 2*v2 + v3)*(v1 - 2*v2 + v3) + 1/4*(v1 - 4*v2 + v3)*(v1 - 4*v2 + v3);
+                    double S2 = 13/12*(v2 - 2*v3 + v4)*(v2 - 2*v3 + v4) + 1/4*(v2 - v4)*(v2 - v4);
+                    double S3 = 13/12*(v3 - 2*v4 + v5)*(v3 - 2*v4 + v5) + 1/4*(3*v3 - 4*v4 + v5)*(3*v3 - 4*v4 + v5);
+
+                    double epsilon = pow(10, -6)*max(max(max(max(v1*v1, v2*v2), v3*v3), v4*v4), v5*v5) + pow(10, -99);
+
+                    double alpha1 = 0.1/((S1 + epsilon)*(S1 + epsilon));
+                    double alpha2 = 0.6/((S2 + epsilon)*(S2 + epsilon));
+                    double alpha3 = 0.3/((S3 + epsilon)*(S3 + epsilon));
+
+                    double omega1 = alpha1/(alpha1 + alpha2 + alpha3);
+                    double omega2 = alpha2/(alpha1 + alpha2 + alpha3);
+                    double omega3 = alpha3/(alpha1 + alpha2 + alpha3);
+
+                    double phiz1 = v1/3 - 7*v2/6 + 11*v3/6;
+                    double phiz2 = -v2/6 + 5*v3/6 + v4/3;
+                    double phiz3 = v3/3 + 5*v4/6 - v5/6;
+
+                    phiz_m = omega1*phiz1 + omega2*phiz2 + omega3*phiz3;
+                    phiz_p = omega1*phiz1 + omega2*phiz2 + omega3*phiz3;
+
+                    if (isnan(phiz_m)){
+                        cout << "nan";
+                    }
+                    if (isnan(phiz_p)){
+                        cout << "nan";
+                    }
+
+                }
+                
+                if (AX[i + j*N + k*P*P] >= 0){
+                    phix.push_back(sqrt(max(max(phix_m, 0.0)*max(phix_m, 0.0), min(phix_p, 0.0)*min(phix_p, 0.0))));
+                } else if (AX[i + j*N + k*P*P] < 0){
+                    phix.push_back(sqrt(max(min(phix_m, 0.0)*min(phix_m, 0.0), max(phix_p, 0.0)*max(phix_p, 0.0))));
+                }
+
+                if (AY[i + j*N + k*P*P] >= 0){
+                    phiy.push_back(sqrt(max(max(phiy_m, 0.0)*max(phiy_m, 0.0), min(phiy_p, 0.0)*min(phiy_p, 0.0))));
+                } else if (AY[i + j*N + k*P*P] < 0){
+                    phiy.push_back(sqrt(max(min(phiy_m, 0.0)*min(phiy_m, 0.0), max(phiy_p, 0.0)*max(phiy_p, 0.0))));
+                }
+
+                if (AZ[i + j*N + k*P*P] >= 0){
+                    phiz.push_back(sqrt(max(max(phiz_m, 0.0)*max(phiz_m, 0.0), min(phiz_p, 0.0)*min(phiz_p, 0.0))));
+                } else if (AZ[i + j*N + k*P*P] < 0){
+                    phiz.push_back(sqrt(max(min(phiz_m, 0.0)*min(phiz_m, 0.0), max(phiz_p, 0.0)*max(phiz_p, 0.0))));
+                }
+            }
+        }
+    }
+    return Derivative{phix, phiy, phiz};
+}
