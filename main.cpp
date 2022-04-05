@@ -65,9 +65,9 @@ int main(){
     double dt = CFL/(vectorMax(vectorAbs(ax)/dx + vectorAbs(ay)/dy + vectorAbs(az)/dz));
     
     double dtau = 0.5*dx;
-    int reinitSteps = 10;
+    int reinitSteps = 1;
     bool doReinit = true;
-    int reinitFreq = 5;
+    int reinitFreq = 1;
 
     bool halfplot = true;
     int it = 0;
@@ -78,9 +78,11 @@ int main(){
     plotTimes.push_back(to_string(0.000000));
 
     vector<Particle> particles;
+    double rmin = 0.1*min(dx, min(dy, dz));
+    double rmax = 0.5*max(dx, max(dy, dz));
 
     // Initializing particles
-    Derivative norm = normal(phi, dx, dy, dz, m, n, p); 
+    Derivative norm = normal(phi, dx, dy, dz, m, n, p); // parse phi and only compute som normals instead?
     for (int k = 0; k < p; ++k){
         for (int j = 0; j < n; ++j){
             for (int i = 0; i < m; ++i){
@@ -144,6 +146,34 @@ int main(){
             particles[a].y = particles[a].y + dt*Vp;
             particles[a].z = particles[a].z + dt*Wp;
 
+
+            // // interface correction
+            // vector<Particle> Ep;
+            // vector<Particle> Em;
+
+            double phip = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
+                z[currentK], z[currentK+1], phi[currentI+currentJ*n+currentK*p*p], phi[(currentI+1)+currentJ*n+currentK*p*p], phi[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
+                phi[currentI+(currentJ+1)*n+currentK*p*p], phi[currentI+currentJ*n+(currentK+1)*p*p], phi[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
+                phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
+
+            if (((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive) ) && (abs(phip) > particles[a].r)){ // correct interface
+                vector<double> phiCorrected = 
+                    correctInterface(particles[a], x[currentI], x[currentI+1], y[currentJ], y[currentJ+1], z[currentK], z[currentK+1],
+                    phi[(currentI)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ+1)*n+(currentK)*p*p],
+                    phi[(currentI)+(currentJ+1)*n+(currentK)*p*p], phi[(currentI)+(currentJ)*n+(currentK+1)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK+1)*p*p],
+                    phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p], phip);
+
+                    phi[(currentI)+(currentJ)*n+(currentK)*p*p] = phiCorrected[0];
+                    phi[(currentI+1)+(currentJ)*n+(currentK)*p*p] = phiCorrected[1];
+                    phi[(currentI+1)+(currentJ+1)*n+(currentK)*p*p] = phiCorrected[2];
+                    phi[(currentI)+(currentJ+1)*n+(currentK)*p*p] = phiCorrected[3];
+                    phi[(currentI)+(currentJ)*n+(currentK+1)*p*p] = phiCorrected[4];
+                    phi[(currentI+1)+(currentJ)*n+(currentK+1)*p*p] = phiCorrected[5];
+                    phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p] = phiCorrected[6];
+                    phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p] = phiCorrected[7];
+                    
+            }
+
         }
 
         if (doReinit && (it%reinitFreq == 0)){ // it!=0?
@@ -168,6 +198,7 @@ int main(){
                     currentK = b;
                 }
             }
+
             double phip = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
                 z[currentK], z[currentK+1], phi[currentI+currentJ*n+currentK*p*p], phi[(currentI+1)+currentJ*n+currentK*p*p], phi[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
                 phi[currentI+(currentJ+1)*n+currentK*p*p], phi[currentI+currentJ*n+(currentK+1)*p*p], phi[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
@@ -175,10 +206,10 @@ int main(){
 
             if (((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive) ) && (abs(phip) > particles[a].r)){ // correct interface
                 vector<double> phiCorrected = 
-                    correctInterface(particles[a], x[currentI], x[currentI+1], y[currentJ], y[currentJ+1], z[currentK], z[currentK],
+                    correctInterface(particles[a], x[currentI], x[currentI+1], y[currentJ], y[currentJ+1], z[currentK], z[currentK+1],
                     phi[(currentI)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ+1)*n+(currentK)*p*p],
                     phi[(currentI)+(currentJ+1)*n+(currentK)*p*p], phi[(currentI)+(currentJ)*n+(currentK+1)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK+1)*p*p],
-                    phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p]);
+                    phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p], phip);
 
                     phi[(currentI)+(currentJ)*n+(currentK)*p*p] = phiCorrected[0];
                     phi[(currentI+1)+(currentJ)*n+(currentK)*p*p] = phiCorrected[1];
@@ -189,7 +220,17 @@ int main(){
                     phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p] = phiCorrected[6];
                     phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p] = phiCorrected[7];
                     
-            } 
+            }
+
+            // Adjust radius
+            if (sign(phip)*phip > rmax){
+                particles[a].r = rmax;
+            } else if (sign(phip)*phip < rmin){
+                particles[a].r = rmin;
+            } else {
+                particles[a].r = sign(phip)*phip;
+            }
+
         }
 
         if (it%10 == 0){
@@ -198,7 +239,7 @@ int main(){
             cout << "Elapsed time: " << (chrono::duration_cast<chrono::seconds>(currentTime - startTime).count())  << " s." << endl;
             cout << "t = " << t << endl;
         }
-        if (it%50 == 0){
+        if (it%100 == 0){
             saveScalarField(to_string(t) + ".txt", phi, x, y, z, m, n, p);
             plotTimes.push_back(to_string(t));
         }

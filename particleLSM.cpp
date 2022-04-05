@@ -14,7 +14,7 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
     double bmin = rmin;
     double bmax = 3.0*max(dx, max(dy, dz));
     double lambda = 1.0;
-    double itmax = 15;
+    double itmax = 10;
     for (int p = 0; p < numParticles; ++p){
         double x = x0 + dx*distr(gen)/100.0;
         double y = y0 + dy*distr(gen)/100.0;
@@ -57,20 +57,6 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
             continue;
         }
 
-        // particles.push_back(Particle(x, y, z));
-        // if (sign(phip)*phip > rmax){
-        //     particles[p].r = rmax;
-        // } else if (sign(phip)*phip < rmin){
-        //     particles[p].r = rmin;
-        // } else {
-        //     particles[p].r = sign(phip)*phip;
-        // }
-        // if (sign(phip) >= 0){
-        //     particles[p].positive = true;
-        // } else {
-        //     particles[p].positive = false;
-        // }
-
         double r;
         bool pos;
         if (sign(phip)*phip > rmax){
@@ -91,15 +77,23 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
 }
 
 vector<double> correctInterface(Particle p, double x0, double x1, double y0, double y1, double z0, double z1,
-    double phi000, double phi100, double phi110, double phi010, double phi001, double phi101, double phi111, double phi011){
-    double phip000 = sign(p.r - sqrt(pow(x0 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
-    double phip100 = sign(p.r - sqrt(pow(x1 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
-    double phip110 = sign(p.r - sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z0 - p.z, 2)));
-    double phip010 = sign(p.r - sqrt(pow(x0 - p.x, 2) + pow(y1 - p.y, 2) + pow(z0 - p.z, 2)));
-    double phip001 = sign(p.r - sqrt(pow(x0 - p.x, 2) + pow(y0 - p.y, 2) + pow(z1 - p.z, 2)));
-    double phip101 = sign(p.r - sqrt(pow(x1 - p.x, 2) + pow(y0 - p.y, 2) + pow(z1 - p.z, 2)));
-    double phip111 = sign(p.r - sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
-    double phip011 = sign(p.r - sqrt(pow(x0 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
+    double phi000, double phi100, double phi110, double phi010, double phi001, double phi101, double phi111, double phi011, double phip){
+    
+    // double s;
+    // if (p.positive){
+    //     s = 1.0;
+    // } else {
+    //     s = -1.0;
+    // }
+    
+    double phip000 = sign(phip)*(p.r - sqrt(pow(x0 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
+    double phip100 = sign(phip)*(p.r - sqrt(pow(x1 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
+    double phip110 = sign(phip)*(p.r - sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z0 - p.z, 2)));
+    double phip010 = sign(phip)*(p.r - sqrt(pow(x0 - p.x, 2) + pow(y1 - p.y, 2) + pow(z0 - p.z, 2)));
+    double phip001 = sign(phip)*(p.r - sqrt(pow(x0 - p.x, 2) + pow(y0 - p.y, 2) + pow(z1 - p.z, 2)));
+    double phip101 = sign(phip)*(p.r - sqrt(pow(x1 - p.x, 2) + pow(y0 - p.y, 2) + pow(z1 - p.z, 2)));
+    double phip111 = sign(phip)*(p.r - sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
+    double phip011 = sign(phip)*(p.r - sqrt(pow(x0 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
 
     vector<double> phi_p;
     vector<double> phi_m;
