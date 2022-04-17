@@ -57,50 +57,70 @@ int main(){
     double r = 0.15;
 
     signedDistanceField(phi, x, y, z, r, c, m, n, p);
-    auto [ax, ay, az] = vortexVelocity(m, n, p, x, y, z);
+    
+    // auto [ax, ay, az] = simpleVelocity(m, n, p);
 
     double CFL = 0.9;
     double T = 3.0;
+    // double T = 0.75;
 
-    double dt = CFL/(vectorMax(vectorAbs(ax)/dx + vectorAbs(ay)/dy + vectorAbs(az)/dz));
-    
     double dtau = 0.5*dx;
-    int reinitSteps = 1;
+    int reinitSteps = 5;
     bool doReinit = true;
-    int reinitFreq = 1;
+    bool doParticle = false;
+    int reinitFreq = 5;
+    int plotFreq = 100;
+    int reseedFreq = 100;
+    int itmax = 2000;
 
     bool halfplot = true;
-    int it = 0;
 
     vector<string> plotTimes;
+    vector<string> plotTimesParticle;
+    int nParticles = 32;
 
     saveScalarField(to_string(0.000000) + ".txt", phi, x, y, z, m, n, p);
     plotTimes.push_back(to_string(0.000000));
 
+
     vector<Particle> particles;
     double rmin = 0.1*min(dx, min(dy, dz));
     double rmax = 0.5*max(dx, max(dy, dz));
+    double bmin = rmin;
+    double bmax = 3.0*max(dx, max(dy, dz));
 
     // Initializing particles
-    Derivative norm = normal(phi, dx, dy, dz, m, n, p); // parse phi and only compute som normals instead?
-    for (int k = 0; k < p; ++k){
-        for (int j = 0; j < n; ++j){
-            for (int i = 0; i < m; ++i){
-                if (abs(phi[i + j*n + k*p*p] < 3*max(dx, max(dy,dz)))){
-                    vector<Particle> newParticles = initializeParticles(x[i], y[j], z[k], dx, dy, dz, phi, norm, i, j, k, m, n, p);
-                    particles.insert(particles.end(), newParticles.begin(), newParticles.end()); // fix not double cells
+    if (doParticle){
+        Derivative norm = normal(phi, dx, dy, dz, m, n, p); // parse phi and only compute some normals instead?
+        for (int k = 0; k < p; ++k){
+            for (int j = 0; j < n; ++j){
+                for (int i = 0; i < m; ++i){
+                    if (abs(phi[i + j*n + k*p*p]) < 3*max(dx, max(dy,dz))){
+                        vector<Particle> newParticles = initializeParticles(x[i], y[j], z[k], dx, dy, dz, phi, norm, i, j, k, m, n, p, nParticles);
+                        particles.insert(particles.end(), newParticles.begin(), newParticles.end()); // fix not double cells
+                    }
                 }
             }
         }
+
+        plotParticles(to_string(0.000000) + "particle.txt" , particles);
+        plotTimesParticle.push_back(to_string(0.000000) + "particle");
     }
 
-    for (double t = 0; t < T; t += dt){
+    double dt = 0;
+    double t = 0;
+    int numIt = 0;
 
-        ++it;
+    for (int it = 0; it < itmax; ++it){
+
+        auto [ax, ay, az] = vortexVelocity(m, n, p, x, y, z, t, T);
+        dt = CFL/(vectorMax(vectorAbs(ax)/dx + vectorAbs(ay)/dy + vectorAbs(az)/dz));
 
         if (t + dt > T){
             dt = T - t;
         }
+
+        t += dt;
 
         if (t > 1.5 && halfplot){
             saveScalarField(to_string(t) + ".txt", phi, x, y, z, m, n, p);
@@ -111,57 +131,58 @@ int main(){
         TVDRK3_weno(phi, ax, ay, az, m, n, p, dx, dy, dz, dt);
 
         // Advect particles
-        for (int a = 0; a < particles.size(); ++a){
-            double currentI;
-            double currentJ;
-            double currentK;
-            for (int b = 0; b < m; ++b){
-                if (particles[a].x >= x[b] && particles[a].x <= x[b+1]){
-                    currentI = b;
+        if (doParticle){
+            for (int a = 0; a < particles.size(); ++a){
+                double currentI;
+                double currentJ;
+                double currentK;
+                for (int b = 0; b < m; ++b){
+                    if (particles[a].x >= x[b] && particles[a].x <= x[b+1]){
+                        currentI = b;
+                    }
+                    if (particles[a].y >= y[b] && particles[a].y <= y[b+1]){
+                        currentJ = b;
+                    }
+                    if (particles[a].z >= z[b] && particles[a].z <= z[b+1]){
+                        currentK = b;
+                    }
                 }
-                if (particles[a].y >= y[b] && particles[a].y <= y[b+1]){
-                    currentJ = b;
+
+                double Up = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
+                    z[currentK], z[currentK+1], ax[currentI+currentJ*n+currentK*p*p], ax[(currentI+1)+currentJ*n+currentK*p*p], ax[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
+                    ax[currentI+(currentJ+1)*n+currentK*p*p], ax[currentI+currentJ*n+(currentK+1)*p*p], ax[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
+                    ax[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], ax[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
+
+                double Vp = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
+                    z[currentK], z[currentK+1], ay[currentI+currentJ*n+currentK*p*p], ay[(currentI+1)+currentJ*n+currentK*p*p], ay[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
+                    ay[currentI+(currentJ+1)*n+currentK*p*p], ay[currentI+currentJ*n+(currentK+1)*p*p], ay[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
+                    ay[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], ay[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
+
+                double Wp = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
+                    z[currentK], z[currentK+1], az[currentI+currentJ*n+currentK*p*p], az[(currentI+1)+currentJ*n+currentK*p*p], az[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
+                    az[currentI+(currentJ+1)*n+currentK*p*p], az[currentI+currentJ*n+(currentK+1)*p*p], az[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
+                    az[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], az[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
+
+                particles[a].x = particles[a].x + dt*Up;
+                particles[a].y = particles[a].y + dt*Vp;
+                particles[a].z = particles[a].z + dt*Wp;
+
+                double phip = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
+                    z[currentK], z[currentK+1], phi[currentI+currentJ*n+currentK*p*p], phi[(currentI+1)+currentJ*n+currentK*p*p], phi[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
+                    phi[currentI+(currentJ+1)*n+currentK*p*p], phi[currentI+currentJ*n+(currentK+1)*p*p], phi[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
+                    phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
+
+                // Delete particles
+                if ((((phip > bmax) && particles[a].positive) || ((phip > -bmax) && !particles[a].positive) || abs(phip) > 3*max(dx, max(dy,dz))) && (it%reseedFreq==0)){
+                    particles.erase(particles.begin() + a); // Nytt med abs(phip) > 4*max.. ikke testet.
                 }
-                if (particles[a].z >= z[b] && particles[a].z <= z[b+1]){
-                    currentK = b;
-                }
-            }
-
-            double Up = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
-                z[currentK], z[currentK+1], ax[currentI+currentJ*n+currentK*p*p], ax[(currentI+1)+currentJ*n+currentK*p*p], ax[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
-                ax[currentI+(currentJ+1)*n+currentK*p*p], ax[currentI+currentJ*n+(currentK+1)*p*p], ax[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
-                ax[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], ax[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
-
-            double Vp = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
-                z[currentK], z[currentK+1], ay[currentI+currentJ*n+currentK*p*p], ay[(currentI+1)+currentJ*n+currentK*p*p], ay[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
-                ay[currentI+(currentJ+1)*n+currentK*p*p], ay[currentI+currentJ*n+(currentK+1)*p*p], ay[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
-                ay[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], ay[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
-
-            double Wp = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
-                z[currentK], z[currentK+1], az[currentI+currentJ*n+currentK*p*p], az[(currentI+1)+currentJ*n+currentK*p*p], az[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
-                az[currentI+(currentJ+1)*n+currentK*p*p], az[currentI+currentJ*n+(currentK+1)*p*p], az[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
-                az[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], az[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
-
-            particles[a].x = particles[a].x + dt*Up;
-            particles[a].y = particles[a].y + dt*Vp;
-            particles[a].z = particles[a].z + dt*Wp;
-
-
-            // // interface correction
-            // vector<Particle> Ep;
-            // vector<Particle> Em;
-
-            double phip = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
-                z[currentK], z[currentK+1], phi[currentI+currentJ*n+currentK*p*p], phi[(currentI+1)+currentJ*n+currentK*p*p], phi[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
-                phi[currentI+(currentJ+1)*n+currentK*p*p], phi[currentI+currentJ*n+(currentK+1)*p*p], phi[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
-                phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
-
-            if (((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive) ) && (abs(phip) > particles[a].r)){ // correct interface
-                vector<double> phiCorrected = 
-                    correctInterface(particles[a], x[currentI], x[currentI+1], y[currentJ], y[currentJ+1], z[currentK], z[currentK+1],
-                    phi[(currentI)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ+1)*n+(currentK)*p*p],
-                    phi[(currentI)+(currentJ+1)*n+(currentK)*p*p], phi[(currentI)+(currentJ)*n+(currentK+1)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK+1)*p*p],
-                    phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p], phip);
+                // interface correction
+                else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)  && (abs(phip) > particles[a].r)){ // correct interface
+                    vector<double> phiCorrected = 
+                        correctInterface(particles[a], x[currentI], x[currentI+1], y[currentJ], y[currentJ+1], z[currentK], z[currentK+1],
+                        phi[(currentI)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ+1)*n+(currentK)*p*p],
+                        phi[(currentI)+(currentJ+1)*n+(currentK)*p*p], phi[(currentI)+(currentJ)*n+(currentK+1)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK+1)*p*p],
+                        phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p], phip);
 
                     phi[(currentI)+(currentJ)*n+(currentK)*p*p] = phiCorrected[0];
                     phi[(currentI+1)+(currentJ)*n+(currentK)*p*p] = phiCorrected[1];
@@ -171,9 +192,46 @@ int main(){
                     phi[(currentI+1)+(currentJ)*n+(currentK+1)*p*p] = phiCorrected[5];
                     phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p] = phiCorrected[6];
                     phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p] = phiCorrected[7];
-                    
+                        
+                }
             }
 
+            // Initialize new particles
+            if (it%reseedFreq == 0 && it != 0){
+                // sortParticles(particles, m, n); // ikke riktig ennå
+                vector<Particle> addedParticles;
+                vector<int> particleList(particles.size());
+                iota (begin(particleList), end(particleList), 0);
+                Derivative norm = normal(phi, dx, dy, dz, m, n, p); // parse phi and only compute some normals instead?
+                for (int k = 0; k < p; ++k){
+                    for (int j = 0; j < n; ++j){
+                        for (int i = 0; i < m; ++i){
+                            if (abs(phi[i+j*n+k*p*p]) < 2*max(dx, max(dy,dz))){
+                                int count = 0;
+                                for (int a = 0; a < particleList.size(); ++a){
+                                    if (x[i] <= particles[particleList[a]].x && x[i+1] >= particles[particleList[a]].x && 
+                                        y[j] <= particles[particleList[a]].y && y[j+1] >= particles[particleList[a]].y && 
+                                        z[k] <= particles[particleList[a]].z && z[k+1] >= particles[particleList[a]].z){
+                                        // copy all points to other list and delete to not check same particle multiple times?
+                                        if (count > nParticles){
+                                            particles.erase(particles.begin() + particleList[a]);
+                                        }
+                                        count += 1;
+                                        particleList.erase(particleList.begin() + a);
+                                        a -= 1;
+                                    }
+                                }
+                                if (count < nParticles){
+                                    int num = nParticles - count;
+                                    vector<Particle> newParticles = initializeParticles(x[i], y[j], z[k], dx, dy, dz, phi, norm, i, j, k, m, n, p, num);
+                                    addedParticles.insert(addedParticles.end(), newParticles.begin(), newParticles.end()); // fix not double cells
+                                }
+                            }
+                        }
+                    }
+                }
+                particles.insert(particles.end(), addedParticles.begin(), addedParticles.end());
+            }
         }
 
         if (doReinit && (it%reinitFreq == 0)){ // it!=0?
@@ -183,33 +241,37 @@ int main(){
             }
         }
 
-        for (int a = 0; a < particles.size(); ++a){
-            double currentI;
-            double currentJ;
-            double currentK;
-            for (int b = 0; b < m; ++b){
-                if (particles[a].x >= x[b] && particles[a].x <= x[b+1]){
-                    currentI = b;
+        if (doParticle){
+            for (int a = 0; a < particles.size(); ++a){
+                double currentI;
+                double currentJ;
+                double currentK;
+                for (int b = 0; b < m; ++b){
+                    if (particles[a].x >= x[b] && particles[a].x <= x[b+1]){
+                        currentI = b;
+                    }
+                    if (particles[a].y >= y[b] && particles[a].y <= y[b+1]){
+                        currentJ = b;
+                    }
+                    if (particles[a].z >= z[b] && particles[a].z <= z[b+1]){
+                        currentK = b;
+                    }
                 }
-                if (particles[a].y >= y[b] && particles[a].y <= y[b+1]){
-                    currentJ = b;
-                }
-                if (particles[a].z >= z[b] && particles[a].z <= z[b+1]){
-                    currentK = b;
-                }
-            }
 
-            double phip = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
-                z[currentK], z[currentK+1], phi[currentI+currentJ*n+currentK*p*p], phi[(currentI+1)+currentJ*n+currentK*p*p], phi[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
-                phi[currentI+(currentJ+1)*n+currentK*p*p], phi[currentI+currentJ*n+(currentK+1)*p*p], phi[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
-                phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
+                double phip = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, x[currentI], x[currentI+1], y[currentJ], y[currentJ+1],
+                    z[currentK], z[currentK+1], phi[currentI+currentJ*n+currentK*p*p], phi[(currentI+1)+currentJ*n+currentK*p*p], phi[(currentI+1)+(currentJ+1)*n+currentK*p*p], 
+                    phi[currentI+(currentJ+1)*n+currentK*p*p], phi[currentI+currentJ*n+(currentK+1)*p*p], phi[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
+                    phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
 
-            if (((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive) ) && (abs(phip) > particles[a].r)){ // correct interface
-                vector<double> phiCorrected = 
-                    correctInterface(particles[a], x[currentI], x[currentI+1], y[currentJ], y[currentJ+1], z[currentK], z[currentK+1],
-                    phi[(currentI)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ+1)*n+(currentK)*p*p],
-                    phi[(currentI)+(currentJ+1)*n+(currentK)*p*p], phi[(currentI)+(currentJ)*n+(currentK+1)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK+1)*p*p],
-                    phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p], phip);
+                // if (((phip > bmax) && particles[a].positive) || ((phip > -bmax) && !particles[a].positive)){
+                //     particles.erase(particles.begin() + a);
+                // } else 
+                if (((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive) ) && (abs(phip) > particles[a].r)){ // correct interface
+                    vector<double> phiCorrected = 
+                        correctInterface(particles[a], x[currentI], x[currentI+1], y[currentJ], y[currentJ+1], z[currentK], z[currentK+1],
+                        phi[(currentI)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ+1)*n+(currentK)*p*p],
+                        phi[(currentI)+(currentJ+1)*n+(currentK)*p*p], phi[(currentI)+(currentJ)*n+(currentK+1)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK+1)*p*p],
+                        phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p], phip);
 
                     phi[(currentI)+(currentJ)*n+(currentK)*p*p] = phiCorrected[0];
                     phi[(currentI+1)+(currentJ)*n+(currentK)*p*p] = phiCorrected[1];
@@ -219,18 +281,19 @@ int main(){
                     phi[(currentI+1)+(currentJ)*n+(currentK+1)*p*p] = phiCorrected[5];
                     phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p] = phiCorrected[6];
                     phi[(currentI)+(currentJ+1)*n+(currentK+1)*p*p] = phiCorrected[7];
-                    
-            }
+                        
+                }
 
-            // Adjust radius
-            if (sign(phip)*phip > rmax){
-                particles[a].r = rmax;
-            } else if (sign(phip)*phip < rmin){
-                particles[a].r = rmin;
-            } else {
-                particles[a].r = sign(phip)*phip;
-            }
+                // Adjust radius
+                if (sign(phip)*phip > rmax){
+                    particles[a].r = rmax;
+                } else if (sign(phip)*phip < rmin){
+                    particles[a].r = rmin;
+                } else {
+                    particles[a].r = sign(phip)*phip;
+                }
 
+            }
         }
 
         if (it%10 == 0){
@@ -239,21 +302,55 @@ int main(){
             cout << "Elapsed time: " << (chrono::duration_cast<chrono::seconds>(currentTime - startTime).count())  << " s." << endl;
             cout << "t = " << t << endl;
         }
-        if (it%100 == 0){
+        if (it%plotFreq == 0){
             saveScalarField(to_string(t) + ".txt", phi, x, y, z, m, n, p);
             plotTimes.push_back(to_string(t));
+
+            if (doParticle){
+                plotParticles(to_string(t) + "particle.txt" , particles);
+                plotTimesParticle.push_back(to_string(t) + "particle");
+            }
         }
+
+        if (t == T){
+            numIt = it;
+            break;
+        }
+
     }
 
     saveScalarField(to_string(T) + ".txt", phi, x, y, z, m, n, p);
     plotTimes.push_back(to_string(T));
 
-    ofstream file;
-    file.open("plotTimes.txt");
-    if (!file.is_open()){cerr << "could not open file." << endl;}
-    for (int i = 0; i < plotTimes.size(); ++i){
-        file << plotTimes[i] << endl;
+    {
+        ofstream file;
+        file.open("plotTimes.txt");
+        if (!file.is_open()){cerr << "could not open file." << endl;}
+        for (int i = 0; i < plotTimes.size(); ++i){
+            file << plotTimes[i] << endl;
+        }
+        file.close();
     }
-    file.close();
+
+    if (doParticle){
+        ofstream file;
+        file.open("plotTimesParticle.txt");
+        if (!file.is_open()){cerr << "could not open file." << endl;}
+        for (int i = 0; i < plotTimesParticle.size(); ++i){
+            file << plotTimesParticle[i] << endl;
+        }
+        file.close();
+    }
+
+    {
+        ofstream file;
+        file.open("log.txt");
+        if (!file.is_open()){cerr << "could not open file." << endl;}
+        file << "Iterations: " << numIt << endl;
+        chrono::steady_clock::time_point currentTime = chrono::steady_clock::now();
+        file << "Elapsed time: " << (chrono::duration_cast<chrono::seconds>(currentTime - startTime).count())  << " s." << endl;
+        file.close();
+    }
+
     return 0;
 }
