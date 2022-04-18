@@ -67,7 +67,7 @@ int main(){
     double dtau = 0.5*dx;
     int reinitSteps = 5;
     bool doReinit = true;
-    bool doParticle = false;
+    bool doParticle = true;
     int reinitFreq = 5;
     int plotFreq = 100;
     int reseedFreq = 100;
@@ -111,7 +111,11 @@ int main(){
     double t = 0;
     int numIt = 0;
 
-    for (int it = 0; it < itmax; ++it){
+    cout << "Setup complete." << endl;
+    chrono::steady_clock::time_point currentTime = chrono::steady_clock::now();
+    cout << "Elapsed time: " << (chrono::duration_cast<chrono::seconds>(currentTime - startTime).count())  << " s." << endl;
+
+    for (int it = 1; it < itmax; ++it){
 
         auto [ax, ay, az] = vortexVelocity(m, n, p, x, y, z, t, T);
         dt = CFL/(vectorMax(vectorAbs(ax)/dx + vectorAbs(ay)/dy + vectorAbs(az)/dz));
@@ -198,39 +202,45 @@ int main(){
 
             // Initialize new particles
             if (it%reseedFreq == 0 && it != 0){
-                // sortParticles(particles, m, n); // ikke riktig ennå
-                vector<Particle> addedParticles;
-                vector<int> particleList(particles.size());
-                iota (begin(particleList), end(particleList), 0);
-                Derivative norm = normal(phi, dx, dy, dz, m, n, p); // parse phi and only compute some normals instead?
-                for (int k = 0; k < p; ++k){
-                    for (int j = 0; j < n; ++j){
-                        for (int i = 0; i < m; ++i){
-                            if (abs(phi[i+j*n+k*p*p]) < 2*max(dx, max(dy,dz))){
-                                int count = 0;
-                                for (int a = 0; a < particleList.size(); ++a){
-                                    if (x[i] <= particles[particleList[a]].x && x[i+1] >= particles[particleList[a]].x && 
-                                        y[j] <= particles[particleList[a]].y && y[j+1] >= particles[particleList[a]].y && 
-                                        z[k] <= particles[particleList[a]].z && z[k+1] >= particles[particleList[a]].z){
-                                        // copy all points to other list and delete to not check same particle multiple times?
-                                        if (count > nParticles){
-                                            particles.erase(particles.begin() + particleList[a]);
-                                        }
-                                        count += 1;
-                                        particleList.erase(particleList.begin() + a);
-                                        a -= 1;
-                                    }
-                                }
-                                if (count < nParticles){
-                                    int num = nParticles - count;
-                                    vector<Particle> newParticles = initializeParticles(x[i], y[j], z[k], dx, dy, dz, phi, norm, i, j, k, m, n, p, num);
-                                    addedParticles.insert(addedParticles.end(), newParticles.begin(), newParticles.end()); // fix not double cells
-                                }
+                vector<int> cellx;
+                vector<int> celly;
+                vector<int> cellz;
+                vector<int> cellParticles;
+                cellx.push_back((int)(particles[0].x/dx));
+                celly.push_back((int)(particles[0].y/dy));
+                cellz.push_back((int)(particles[0].z/dz));
+                cellParticles.push_back(1);
+
+                bool found = false;
+                for (int a = 1; a < particles.size(); ++a){
+                    for (int b = 0; b < cellx.size(); ++b){
+                        if ((int)(particles[a].x/dx) == cellx[b] && (int)(particles[a].y/dy) == celly[b] && (int)(particles[a].z/dz) == cellz[b]){
+                            cellParticles[b] += 1;
+                            if (cellParticles[b] > nParticles){
+                                particles.erase(particles.begin() + a);
+                                a -= 1;
                             }
+                            found = true;
+                            break;
                         }
                     }
+                    if (!found){
+                        cellx.push_back((int)(particles[a].x/dx));
+                        celly.push_back((int)(particles[a].y/dy));
+                        cellz.push_back((int)(particles[a].z/dz));
+                        cellParticles.push_back(1);
+                        found = false;
+                    }
                 }
-                particles.insert(particles.end(), addedParticles.begin(), addedParticles.end());
+
+                Derivative norm = normal(phi, dx, dy, dz, m, n, p); // parse phi and only compute some normals instead?
+                for (int a = 0; a < cellx.size(); ++a){
+                    int num = nParticles - cellParticles[a];
+                    if (num > 0){
+                        vector<Particle> newParticles = initializeParticles(x[cellx[a]], y[celly[a]], z[cellz[a]], dx, dy, dz, phi, norm, cellx[a], celly[a], cellz[a], m, n, p, num);
+                        particles.insert(particles.end(), newParticles.begin(), newParticles.end()); // fix not double cells
+                    }
+                }
             }
         }
 
