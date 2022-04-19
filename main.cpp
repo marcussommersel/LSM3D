@@ -33,9 +33,9 @@ int main(){
         // euler_upwindTest();
     }
 
-    const int m = 128;
-    const int n = 128; 
-    const int p = 128;
+    const int m = 50;
+    const int n = 50; 
+    const int p = 50;
 
     const double xStart = 0;
     const double xEnd = 1;
@@ -57,6 +57,8 @@ int main(){
     double r = 0.15;
 
     signedDistanceField(phi, x, y, z, r, c, m, n, p);
+
+    double initialVolume = volume(phi, dx, dy, dz); 
     
     // auto [ax, ay, az] = simpleVelocity(m, n, p);
 
@@ -178,7 +180,7 @@ int main(){
 
                 // Delete particles
                 if ((((phip > bmax) && particles[a].positive) || ((phip > -bmax) && !particles[a].positive) || abs(phip) > 3*max(dx, max(dy,dz))) && (it%reseedFreq==0)){
-                    particles.erase(particles.begin() + a); // Nytt med abs(phip) > 4*max.. ikke testet.
+                    particles.erase(particles.begin() + a);
                 }
                 // interface correction
                 else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)  && (abs(phip) > particles[a].r)){ // correct interface
@@ -238,13 +240,13 @@ int main(){
                     int num = nParticles - cellParticles[a];
                     if (num > 0){
                         vector<Particle> newParticles = initializeParticles(x[cellx[a]], y[celly[a]], z[cellz[a]], dx, dy, dz, phi, norm, cellx[a], celly[a], cellz[a], m, n, p, num);
-                        particles.insert(particles.end(), newParticles.begin(), newParticles.end()); // fix not double cells
+                        particles.insert(particles.end(), newParticles.begin(), newParticles.end());
                     }
                 }
             }
         }
 
-        if (doReinit && (it%reinitFreq == 0)){ // it!=0?
+        if (doReinit && (it%reinitFreq == 0)){
             vector<double> phi0 = phi;
             for (int i = 0; i < reinitSteps - 1; ++i){
                 euler_upwind_reinit(phi, m, n, p, dx, dy, dz, dtau, phi0);
@@ -329,6 +331,9 @@ int main(){
 
     }
 
+    double endVolume = volume(phi, dx, dy, dz);
+    double volumeChange = 100*(initialVolume-endVolume)/initialVolume;
+
     saveScalarField(to_string(T) + ".txt", phi, x, y, z, m, n, p);
     plotTimes.push_back(to_string(T));
 
@@ -359,6 +364,9 @@ int main(){
         file << "Iterations: " << numIt << endl;
         chrono::steady_clock::time_point currentTime = chrono::steady_clock::now();
         file << "Elapsed time: " << (chrono::duration_cast<chrono::seconds>(currentTime - startTime).count())  << " s." << endl;
+        file << "Initial volume: " << initialVolume << endl;
+        file << "End volume: " << endVolume << endl;
+        file << "Volume change: " << volumeChange << " %" << endl; 
         file.close();
     }
 
