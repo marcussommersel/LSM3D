@@ -43,7 +43,7 @@ def getSurface(volume, m, n, p, level=0, plot=True, filename='fig'):
         plt.savefig('figures/' + filename + '.png')
         plt.close()
 
-def printScatter(filename):
+def plotParticle(filename):
     f = open(filename)
 
     x = []
@@ -52,10 +52,6 @@ def printScatter(filename):
 
     count = 0
     for line in f.readlines():
-        if count == 0:
-            count += 1
-            continue
-        count += 1
         parsedLine = line.split(',')
         x.append(float(parsedLine[0]))
         y.append(float(parsedLine[1]))
@@ -66,14 +62,24 @@ def printScatter(filename):
     ax.scatter(x,y,z)
     plt.xlabel('x')
     plt.ylabel('y')
-
-    plt.show()
+    plt.savefig('figures/' + filename + '.png')
+    plt.close()
 
 def main():
     f = open('plotTimes.txt')
     for line in f.readlines():
         phi, m, n, p = readFile(line[:-1] + '.txt')
         getSurface(phi, m, n, p, 0, True, line[:-1])
+
+    g = open('plotTimesParticle.txt')
+    for line in g.readlines():
+        plotParticle(line[:-1] + '.txt')
+
+    # filename = '2.810652'
+    # phi, m, n, p = readFile(filename + '.txt')
+    # getSurface(phi, m, n, p, 0, True, filename)
+    # plotParticle(filename + 'particle.txt')
+
 
 if __name__=='__main__':
     main()
