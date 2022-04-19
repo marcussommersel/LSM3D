@@ -1,6 +1,4 @@
 #include "initialization.h"
-#include <iostream>
-#include <fstream>
 
 Point Point::operator+(Point const &p){
     Point temp;
