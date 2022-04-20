@@ -205,9 +205,7 @@ int main(){
                     phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
 
                 // Delete particles
-                if ((((phip > bmax) && particles[a].positive) || ((phip > -bmax) && !particles[a].positive) || abs(phip) > 3*max(dx, max(dy,dz))) && (it%reseedFreq==0)){ // feil?
-                // if ((((phip > bmax) && particles[a].positive) || ((phip < -bmax) && !particles[a].positive) || abs(phip) > 3*max(dx, max(dy,dz))) && (it%reseedFreq==0)){
-                // if (abs(phip) > 3*max(dx, max(dy,dz))){
+                if (abs(phip) > bmax){
                     particles.erase(particles.begin() + a);
                 }
                 // interface correction
@@ -303,14 +301,9 @@ int main(){
                     phi[currentI+(currentJ+1)*n+currentK*p*p], phi[currentI+currentJ*n+(currentK+1)*p*p], phi[(currentI+1)+currentJ*n+(currentK+1)*p*p], 
                     phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
 
-                // if (((phip > bmax) && particles[a].positive) || ((phip > -bmax) && !particles[a].positive)){
-                //     particles.erase(particles.begin() + a);
-                // } else // gammelt
-
-                // if (abs(phip) > 3*max(dx, max(dy,dz))){
-                //     particles.erase(particles.begin() + a);
-                // } else 
-                if (((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive) ) && (abs(phip) > particles[a].r)){ // correct interface
+                if (abs(phip) > bmax){
+                    particles.erase(particles.begin() + a);
+                } else if (((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive) ) && (abs(phip) > particles[a].r)){ // correct interface
                     vector<double> phiCorrected = 
                         correctInterface(particles[a], x[currentI], x[currentI+1], y[currentJ], y[currentJ+1], z[currentK], z[currentK+1],
                         phi[(currentI)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ)*n+(currentK)*p*p], phi[(currentI+1)+(currentJ+1)*n+(currentK)*p*p],
