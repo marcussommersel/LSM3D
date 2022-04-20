@@ -37,12 +37,12 @@ int main(){
     const int n = 50; 
     const int p = 50;
 
-    const double xStart = 0;
-    const double xEnd = 1;
-    const double yStart = 0;
-    const double yEnd = 1;
-    const double zStart = 0;
-    const double zEnd = 1;
+    const double xStart = 0.0;
+    const double xEnd = 1.0;
+    const double yStart = 0.0;
+    const double yEnd = 1.0;
+    const double zStart = 0.0;
+    const double zEnd = 1.0;
 
     vector<double> x = linspace(xStart, xEnd, m);
     vector<double> y = linspace(yStart, yEnd, n);
@@ -52,34 +52,45 @@ int main(){
     double dy = y[1] - y[0];
     double dz = z[1] - z[0];
 
+    double dtau = 0.5*dx;
+    int reinitSteps = 5;
+    bool doReinit = true;
+    bool doParticle = true;
+    int nParticles = 32;
+    int reinitFreq = 5;
+    int plotFreq = 25;
+    int reseedFreq = 100;
+    int itmax = 2000;
+    double CFL = 0.9;
+    bool halfplot = true;
+    string testcase = "vortex";
+    // string testcase = "sheared";
+
+    Point c;
+    double r;
+    double T;
+    if (testcase == "vortex"){
+        c = Point(0.35,0.35,0.35);
+        r = 0.15;
+        T = 3.0;
+
+    } else if (testcase == "sheared"){
+        c = Point(0.5,0.75,0.5);
+        r = 0.15;
+        T = 2.0;
+    }
+
     vector<double> phi;
-    Point c = Point(0.35,0.35,0.35);
-    double r = 0.15;
 
     signedDistanceField(phi, x, y, z, r, c, m, n, p);
 
     double initialVolume = volume(phi, dx, dy, dz); 
     
     // auto [ax, ay, az] = simpleVelocity(m, n, p);
-
-    double CFL = 0.9;
-    double T = 3.0;
     // double T = 0.75;
-
-    double dtau = 0.5*dx;
-    int reinitSteps = 5;
-    bool doReinit = true;
-    bool doParticle = true;
-    int reinitFreq = 5;
-    int plotFreq = 100;
-    int reseedFreq = 100;
-    int itmax = 2000;
-
-    bool halfplot = true;
 
     vector<string> plotTimes;
     vector<string> plotTimesParticle;
-    int nParticles = 32;
 
     saveScalarField(to_string(0.000000) + ".txt", phi, x, y, z, m, n, p);
     plotTimes.push_back(to_string(0.000000));
@@ -115,11 +126,26 @@ int main(){
 
     cout << "Setup complete." << endl;
     chrono::steady_clock::time_point currentTime = chrono::steady_clock::now();
-    cout << "Elapsed time: " << (chrono::duration_cast<chrono::seconds>(currentTime - startTime).count())  << " s." << endl;
+    cout << "Elapsed time: " << (chrono::duration_cast<chrono::seconds>(currentTime - startTime).count())  << " s." << endl << endl;
+
+    vector<double> ax;
+    vector<double> ay;
+    vector<double> az;
 
     for (int it = 1; it < itmax; ++it){
 
-        auto [ax, ay, az] = vortexVelocity(m, n, p, x, y, z, t, T);
+        if (testcase == "vortex"){
+            Velocity a = vortexVelocity(m, n, p, x, y, z, t, T);
+            ax = a.x;
+            ay = a.y;
+            az = a.z;
+        } else if (testcase == "sheared"){
+            Velocity a = shearedSphereVelocity(m, n, p, x, y, z, t, T);
+            ax = a.x;
+            ay = a.y;
+            az = a.z;
+        }
+        
         dt = CFL/(vectorMax(vectorAbs(ax)/dx + vectorAbs(ay)/dy + vectorAbs(az)/dz));
 
         if (t + dt > T){
@@ -128,7 +154,7 @@ int main(){
 
         t += dt;
 
-        if (t > 1.5 && halfplot){
+        if (t/T > 0.5 && halfplot){
             saveScalarField(to_string(t) + ".txt", phi, x, y, z, m, n, p);
             plotTimes.push_back(to_string(t));
             halfplot = false;
@@ -179,7 +205,9 @@ int main(){
                     phi[(currentI+1)+(currentJ+1)*n+(currentK+1)*p*p], phi[currentI+(currentJ+1)*n+(currentK+1)*p*p]);
 
                 // Delete particles
-                if ((((phip > bmax) && particles[a].positive) || ((phip > -bmax) && !particles[a].positive) || abs(phip) > 3*max(dx, max(dy,dz))) && (it%reseedFreq==0)){
+                if ((((phip > bmax) && particles[a].positive) || ((phip > -bmax) && !particles[a].positive) || abs(phip) > 3*max(dx, max(dy,dz))) && (it%reseedFreq==0)){ // feil?
+                // if ((((phip > bmax) && particles[a].positive) || ((phip < -bmax) && !particles[a].positive) || abs(phip) > 3*max(dx, max(dy,dz))) && (it%reseedFreq==0)){
+                // if (abs(phip) > 3*max(dx, max(dy,dz))){
                     particles.erase(particles.begin() + a);
                 }
                 // interface correction
@@ -277,6 +305,10 @@ int main(){
 
                 // if (((phip > bmax) && particles[a].positive) || ((phip > -bmax) && !particles[a].positive)){
                 //     particles.erase(particles.begin() + a);
+                // } else // gammelt
+
+                // if (abs(phip) > 3*max(dx, max(dy,dz))){
+                //     particles.erase(particles.begin() + a);
                 // } else 
                 if (((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive) ) && (abs(phip) > particles[a].r)){ // correct interface
                     vector<double> phiCorrected = 
@@ -332,7 +364,7 @@ int main(){
     }
 
     double endVolume = volume(phi, dx, dy, dz);
-    double volumeChange = 100*(initialVolume-endVolume)/initialVolume;
+    double volumeChange = 100*(endVolume-initialVolume)/initialVolume;
 
     saveScalarField(to_string(T) + ".txt", phi, x, y, z, m, n, p);
     plotTimes.push_back(to_string(T));
