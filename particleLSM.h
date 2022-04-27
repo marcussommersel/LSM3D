@@ -17,9 +17,6 @@ public:
     Particle(double x1, double y1, double z1, double r1, bool pos){x = x1; y = y1; z = z1; r = r1; positive = pos;}
 };
 
-// vector<Particle> initializeParticles(double x0, double y0, double z0, double dx, double dy, double dz, vector<double> &phi, Derivative &normal,
-//     int i, int j, int k, int M, int N, int P, int numParticles);
-
 vector<Particle> initializeParticles(double x0, double y0, double z0, double dx, double dy, double dz,
     vector<double> &X, vector<double> &Y, vector<double> &Z, vector<double> &phi, Derivative &normal,
     int M, int N, int P, int numParticles);
