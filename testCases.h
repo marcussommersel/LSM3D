@@ -23,3 +23,7 @@ Velocity shearedSphereVelocity(int M, int N, int P, vector<double> X, vector<dou
 Velocity simpleVelocity(int M, int N, int P);
 
 double volume(vector<double> &phi, double dx, double dy, double dz);
+
+double surfaceArea(vector<double> &phi, double dx, double dy, double dz, double M, double N, double P);
+
+double interfaceError(vector<double> &phi0, vector<double> &phi, double dx, double dy, double dz, double M, double N, double P);

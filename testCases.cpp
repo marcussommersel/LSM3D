@@ -63,3 +63,56 @@ double volume(vector<double> &phi, double dx, double dy, double dz){
     }
     return V;
 }
+
+double surfaceArea(vector<double> &phi, double dx, double dy, double dz, double M, double N, double P){
+    double A = 0;
+    double epsilon = 1.5*dx;
+    double phix;
+    double phiy;
+    double phiz;
+    for (int k = 0; k < P; ++k){
+        for (int j = 0; j < N; ++j){
+            for (int i = 0; i < M; ++i){
+                if (i==0 || i==(M-1) || j==0 || j==(N-1) || k==0 || k==(P-1)){
+                    continue;
+                }
+                double phix = (phi[(i+1)+j*N+k*P*P] - phi[(i-1)+j*N+k*P*P])/(2*dx);
+                if (phix == 0){
+                    phix = (phi[(i+1)+j*N+k*P*P] - phi[i+j*N+k*P*P])/(dx);
+                }
+                double phiy = (phi[i+(j+1)*N+k*P*P] - phi[i+(j-1)*N+k*P*P])/(2*dy);
+                if (phiy == 0){
+                    phiy = (phi[i+(j+1)*N+k*P*P] - phi[i+j*N+k*P*P])/(dy);
+                }
+                double phiz = (phi[i+j*N+(k+1)*P*P] - phi[i+j*N+(k-1)*P*P])/(2*dz);
+                if (phiz == 0){
+                    phiz = (phi[i+j*N+(k+1)*P*P] - phi[i+j*N+k*P*P])/(dz);
+                }
+                double sigma;
+                if (phi[i + j*N + k*P*P] < -epsilon){
+                    sigma = 0.0;
+                } else if (-epsilon <= phi[i + j*N + k*P*P] && phi[i + j*N + k*P*P] <= epsilon){
+                    sigma = (1/(2*epsilon) + 1/(2*epsilon)*cos(phi[i + j*N + k*P*P]*PI/epsilon));
+                } else if (epsilon < phi[i + j*N + k*P*P]){
+                    sigma = 0.0;
+                }
+                A += (sigma)*sqrt(phix*phix + phiy*phiy + phiz*phiz)*dx*dy*dz;
+            }
+        }
+    }
+    return A;
+}
+
+double interfaceError(vector<double> &phi0, vector<double> &phi, double dx, double dy, double dz, double M, double N, double P){
+    double epsilon = 1.5*dx;
+    double A = surfaceArea(phi0, dx, dy, dz, M, N, P);
+    double L1 = 0;
+    for (int k = 0; k < P; ++k){
+        for (int j = 0; j < N; ++j){
+            for (int i = 0; i < M; ++i){
+                L1 += abs(1.0*(phi0[i + j*N + k*P*P] < 0) - 1.0*(phi[i + j*N + k*P*P] < 0))*dx*dy*dz;
+            }
+        }
+    }
+    return L1/A;
+}
