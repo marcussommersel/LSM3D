@@ -16,6 +16,10 @@ struct Velocity {
     vector<double> z;
 };
 
-Velocity vortexVelocity(int M, int N, int P, vector<double> X, vector<double> Y, vector<double> Z);
+Velocity vortexVelocity(int M, int N, int P, vector<double> X, vector<double> Y, vector<double> Z, double t, double T);
+
+Velocity shearedSphereVelocity(int M, int N, int P, vector<double> X, vector<double> Y, vector<double> Z, double t, double T);
 
 Velocity simpleVelocity(int M, int N, int P);
+
+double volume(vector<double> &phi, double dx, double dy, double dz);
