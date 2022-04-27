@@ -64,6 +64,10 @@ int main(){
         c = Point(0.5,0.75,0.5);
         r = 0.15;
         T = 2.0;
+    } else if (testcase == "simple"){
+        c = Point(0.35,0.35,0.35);
+        r = 0.15;
+        T = 0.4;
     }
 
     vector<double> phi;
@@ -71,10 +75,6 @@ int main(){
     signedDistanceField(phi, x, y, z, r, c, m, n, p);
 
     double initialVolume = volume(phi, dx, dy, dz); 
-    
-    // auto [ax, ay, az] = simpleVelocity(m, n, p);
-    // T = 0.4;
-
     vector<string> plotTimes;
     vector<string> plotTimesParticle;
     
@@ -96,7 +96,6 @@ int main(){
             for (int j = 0; j < n; ++j){
                 for (int i = 0; i < m; ++i){
                     if (abs(phi[i + j*n + k*p*p]) < 3*max(dx, max(dy,dz))){
-                        // vector<Particle> newParticles = initializeParticles(x[i], y[j], z[k], dx, dy, dz, phi, norm, i, j, k, m, n, p, nParticles);
                         vector<Particle> newParticles = initializeParticles(x[i], y[j], z[k], dx, dy, dz, x, y, z, phi, norm, m, n, p, nParticles);
                         particles.insert(particles.end(), newParticles.begin(), newParticles.end()); // fix not double cells
                     }
@@ -133,6 +132,11 @@ int main(){
             az = a.z;
         } else if (testcase == "sheared"){
             Velocity a = shearedSphereVelocity(m, n, p, x, y, z, t, T);
+            ax = a.x;
+            ay = a.y;
+            az = a.z;
+        } else if (testcase == "simple"){
+           Velocity a = simpleVelocity(m, n, p);
             ax = a.x;
             ay = a.y;
             az = a.z;
@@ -208,7 +212,7 @@ int main(){
                     phi[(i+1)+(j+1)*n+(k+1)*p*p], 
                     phi[i+(j+1)*n+(k+1)*p*p]);
 
-                // // Delete particles
+                // Delete particles
                 if (abs(phip) - particles[a].r > bmax){
                     particles.erase(particles.begin() + a);
                 }
@@ -276,7 +280,6 @@ int main(){
                 for (int a = 0; a < cellx.size(); ++a){
                     int num = nParticles - cellParticles[a];
                     if (num > 0){
-                        // vector<Particle> newParticles = initializeParticles(x[cellx[a]], y[celly[a]], z[cellz[a]], dx, dy, dz, phi, norm, cellx[a], celly[a], cellz[a], m, n, p, num);
                         vector<Particle> newParticles = initializeParticles(x[cellx[a]], y[celly[a]], z[cellz[a]], dx, dy, dz, x, y, z, phi, norm, m, n, p, num);
                         particles.insert(particles.end(), newParticles.begin(), newParticles.end());
                     }
