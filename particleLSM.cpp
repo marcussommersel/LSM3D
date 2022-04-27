@@ -27,7 +27,7 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
 
         if (i < 0 || j < 0 || k < 0 || i >= M || j >= N || k >= P){continue;}
 
-        phip = trilinearInterpolation(x, y, z, X[i], X[i+1], Y[j], Y[j+1], Z[k], Z[k+1], // feil å bruke x0?
+        phip = trilinearInterpolation(x, y, z, X[i], X[i+1], Y[j], Y[j+1], Z[k], Z[k+1],
             phi[i+j*N+k*P*P],
             phi[i+1+j*N+k*P*P],
             phi[i+1+(j+1)*N+k*P*P],
