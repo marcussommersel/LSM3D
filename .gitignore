@@ -1,12 +1,6 @@
-/main.exe
-/test.c
-/test.exe
-/testcpp.exe
-/testcpp.h
 /*.exe
 /*.txt
-/marchingCubes.c
-/*.png
-.vscode/c_cpp_properties.json
 /figures
-/Eigen
+/initialization2DTests.h
+/initializationTests.h
+/schemesTest.h
