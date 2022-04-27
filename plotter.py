@@ -44,7 +44,7 @@ def getSurface(volume, m, n, p, level=0, plot=True, filename='fig'):
         plt.close()
 
 def plotParticle(filename):
-    f = open(filename)
+    f = open(filename + '.txt')
 
     x = []
     y = []
@@ -73,7 +73,7 @@ def main():
 
     g = open('figures/plotTimesParticle.txt')
     for line in g.readlines():
-        plotParticle(line[:-1] + '.txt')
+        plotParticle(line[:-1])
 
     # filename = '2.810652'
     # phi, m, n, p = readFile(filename + '.txt')
