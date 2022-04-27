@@ -116,3 +116,15 @@ double interfaceError(vector<double> &phi0, vector<double> &phi, double dx, doub
     }
     return L1/A;
 }
+
+double massError(vector<double> &phi, double dx, double dy, double dz, double M, double N, double P){
+    double error = 0;
+    for (int k = 0; k < P; ++k){
+        for (int j = 0; j < N; ++j){
+            for (int i = 0; i < M; ++i){
+                error += abs(1.0*(phi[i + j*N + k*P*P] < 0))*dx*dy*dz;
+            }
+        }
+    }
+    return error;
+}

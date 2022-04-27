@@ -77,7 +77,9 @@ int main(){
     double initialVolume = volume(phi, dx, dy, dz); 
     double initialSurfaceArea = surfaceArea(phi, dx, dy, dz, m, n, p);
     vector<double> phi0 = phi;
-    cout << "Initial surface area: " << initialSurfaceArea << endl;
+    double MError0 = massError(phi, dx, dy, dz, m, n, p);
+    double MError = 0;
+
     vector<string> plotTimes;
     vector<string> plotTimesParticle;
     
@@ -94,13 +96,13 @@ int main(){
     // Initializing particles
     cout << "Initializing particles." << endl;
     if (doParticle){
-        Derivative norm = normal(phi, dx, dy, dz, m, n, p); // parse phi and only compute some normals instead?
+        Derivative norm = normal(phi, dx, dy, dz, m, n, p);
         for (int k = 0; k < p; ++k){
             for (int j = 0; j < n; ++j){
                 for (int i = 0; i < m; ++i){
                     if (abs(phi[i + j*n + k*p*p]) < 3*max(dx, max(dy,dz))){
                         vector<Particle> newParticles = initializeParticles(x[i], y[j], z[k], dx, dy, dz, x, y, z, phi, norm, m, n, p, nParticles);
-                        particles.insert(particles.end(), newParticles.begin(), newParticles.end()); // fix not double cells
+                        particles.insert(particles.end(), newParticles.begin(), newParticles.end());
                     }
                 }
             }
@@ -279,7 +281,7 @@ int main(){
                     }
                 }
 
-                Derivative norm = normal(phi, dx, dy, dz, m, n, p); // parse phi and only compute some normals instead?
+                Derivative norm = normal(phi, dx, dy, dz, m, n, p);
                 for (int a = 0; a < cellx.size(); ++a){
                     int num = nParticles - cellParticles[a];
                     if (num > 0){
@@ -296,6 +298,8 @@ int main(){
                 euler_upwind_reinit(phi, m, n, p, dx, dy, dz, dtau, phi0);
             }
         }
+
+        MError += abs(massError(phi, dx, dy, dz, m, n, p) - MError0)*dt;
 
         if (it%10 == 0){
             cout << "Iteration: " << it << endl;
@@ -328,9 +332,17 @@ int main(){
 
     }
 
+    {
+        cout << "Iteration: " << numIt << endl;
+        chrono::steady_clock::time_point currentTime = chrono::steady_clock::now();
+        cout << "Elapsed time: " << (chrono::duration_cast<chrono::seconds>(currentTime - startTime).count())  << " s." << endl;
+        cout << "t = " << t << endl;
+    }
+
     double endVolume = volume(phi, dx, dy, dz);
     double volumeChange = 100*(endVolume-initialVolume)/initialVolume;
     double L1Error = interfaceError(phi0, phi, dx, dy, dz, m, n, p);
+    MError = MError/t;
 
     saveScalarField(savePath + to_string(T) + ".txt", phi, x, y, z, m, n, p);
     plotTimes.push_back(savePath + to_string(T));
@@ -372,6 +384,7 @@ int main(){
         file << "Volume change: " << volumeChange << " %" << endl; 
         file << "Initial surface area: " << initialSurfaceArea << endl;
         file << "Interface error: " << L1Error << endl;
+        file << "Average area error: " << MError << endl;
         file.close();
     }
 
