@@ -1,89 +1,10 @@
 #include "particleLSM.h"
 
-
-// vector<Particle> initializeParticles(double x0, double y0, double z0, double dx, double dy, double dz, vector<double> &phi, Derivative &normal,
-//     int i, int j, int k, int M, int N, int P, int numParticles){ // ikke ta inn hele phi og N
-//     // x0, y0, z0 is lower left coordinate in cell.
-//     vector<Particle> particles;
-//      // Number of particles in each cell.
-//     std::random_device rd; // obtain a random number from hardware
-//     std::mt19937 gen(rd()); // seed the generator
-//     std::uniform_int_distribution<> distr(0, 100); // define the range
-//     double rmin = 0.1*min(dx, min(dy, dz));
-//     double rmax = 0.5*max(dx, max(dy, dz));
-//     double bmin = rmin;
-//     double bmax = 3.0*max(dx, max(dy, dz));
-//     double lambda = 1.0;
-//     double itmax = 10;
-//     for (int p = 0; p < numParticles; ++p){
-//         double x = x0 + dx*distr(gen)/100.0;
-//         double y = y0 + dy*distr(gen)/100.0;
-//         double z = z0 + dz*distr(gen)/100.0;
-//         double phiGoal = bmin + (bmax - bmin)*distr(gen)/100.0;
-//         double it = 0;
-//         // double phip;
-//         bool first = true;
-//         double phip = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-//             phi[i+j*N+k*P*P], phi[i+1+j*N+k*P*P], phi[i+1+(j+1)*N+k*P*P], phi[i+(j+1)*N+k*P*P], 
-//             phi[i+j*N+(k+1)*P*P], phi[i+1+j*N+(k+1)*P*P], phi[i+1+(j+1)*N+(k+1)*P*P], phi[i+(j+1)*N+(k+1)*P*P]);
-
-//         // attraction step
-//         // while (((abs(phip) < bmin) || (abs(phip) > bmax) || first) && (it <= itmax) ){
-
-//         //     phip = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-//         //         phi[i+j*N+k*P*P], phi[i+1+j*N+k*P*P], phi[i+1+(j+1)*N+k*P*P], phi[i+(j+1)*N+k*P*P], 
-//         //         phi[i+j*N+(k+1)*P*P], phi[i+1+j*N+(k+1)*P*P], phi[i+1+(j+1)*N+(k+1)*P*P], phi[i+(j+1)*N+(k+1)*P*P]);
-
-//         //     double Nxp = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-//         //         normal.x[i+j*N+k*P*P], normal.x[i+1+j*N+k*P*P], normal.x[i+1+(j+1)*N+k*P*P], normal.x[i+(j+1)*N+k*P*P], 
-//         //         normal.x[i+j*N+(k+1)*P*P],normal.x[i+1+j*N+(k+1)*P*P], normal.x[i+1+(j+1)*N+(k+1)*P*P], normal.x[i+(j+1)*N+(k+1)*P*P]);
-//         //     x = x + lambda*(phiGoal - phip)*Nxp;
-
-//         //     double Nyp = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-//         //         normal.y[i+j*N+k*P*P], normal.y[i+1+j*N+k*P*P], normal.y[i+1+(j+1)*N+k*P*P], normal.y[i+(j+1)*N+k*P*P], 
-//         //         normal.y[i+j*N+(k+1)*P*P], normal.y[i+1+j*N+(k+1)*P*P], normal.y[i+1+(j+1)*N+(k+1)*P*P], normal.y[i+(j+1)*N+(k+1)*P*P]);
-//         //     y = y + lambda*(phiGoal - phip)*Nyp;
-
-//         //     double Nzp = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-//         //         normal.z[i+j*N+k*P*P], normal.z[i+1+j*N+k*P*P], normal.z[i+1+(j+1)*N+k*P*P], normal.z[i+(j+1)*N+k*P*P], 
-//         //         normal.z[i+j*N+(k+1)*P*P],normal.z[i+1+j*N+(k+1)*P*P], normal.z[i+1+(j+1)*N+(k+1)*P*P], normal.z[i+(j+1)*N+(k+1)*P*P]);
-//         //     z = z + lambda*(phiGoal - phip)*Nzp;
-            
-//         //     it = it + 1;
-//         //     lambda = lambda/2.0;
-//         //     first = false;
-//         // }
-
-//         // if (it >= itmax){
-//         //     continue;
-//         // }
-
-//         double r;
-//         bool pos;
-//         if (sign(phip)*phip > rmax){
-//             r = rmax;
-//         } else if (sign(phip)*phip < rmin){
-//             r = rmin;
-//         } else {
-//             r = sign(phip)*phip;
-//         }
-//         if (sign(phip) >= 0){
-//             pos = true;
-//         } else {
-//             pos = false;
-//         }
-//         particles.push_back(Particle(x, y, z, r, pos));
-//     }
-//     return particles;
-// }
-
-// vector<Particle> initializeParticles(double x0, double y0, double z0, double dx, double dy, double dz, vector<double> &phi, Derivative &normal,
-//     int i, int j, int k, int M, int N, int P, int numParticles){ // ikke ta inn hele phi og N
-vector<Particle> initializeParticles(double x0, double y0, double z0, double dx, double dy, double dz, vector<double> &phi, Derivative &normal,
+vector<Particle> initializeParticles(double x0, double y0, double z0, double dx, double dy, double dz,
+    vector<double> &X, vector<double> &Y, vector<double> &Z, vector<double> &phi, Derivative &normal,
     int M, int N, int P, int numParticles){ // ikke ta inn hele phi og N
     // x0, y0, z0 is lower left coordinate in cell.
     vector<Particle> particles;
-     // Number of particles in each cell.
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
     std::uniform_int_distribution<> distr(0, 100); // define the range
@@ -98,27 +19,7 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
         double x = x0 + dx*distr(gen)/100.0;
         double y = y0 + dy*distr(gen)/100.0;
         double z = z0 + dz*distr(gen)/100.0;
-        double phiGoal = positive*(bmin + (bmax - bmin)*distr(gen)/100.0) - (1-positive)*(bmin + (bmax - bmin)*distr(gen)/100.0);
         double phip;
-
-        // phip = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-        //     phi[i+j*N+k*P*P], phi[i+1+j*N+k*P*P], phi[i+1+(j+1)*N+k*P*P], phi[i+(j+1)*N+k*P*P], 
-        //     phi[i+j*N+(k+1)*P*P], phi[i+1+j*N+(k+1)*P*P], phi[i+1+(j+1)*N+(k+1)*P*P], phi[i+(j+1)*N+(k+1)*P*P]);
-        // double r;
-        // bool pos;
-        // if (sign(phip) >= 0){
-        //     pos = true;
-        // } else if (sign(phip) < 0){
-        //     pos = false;
-        // }
-        // if (sign(phip)*phip > rmax){
-        //     r = rmax;
-        // } else if (sign(phip)*phip < rmin){
-        //     r = rmin;
-        // } else {
-        //     r = sign(phip)*phip;
-        // }            
-        // particles.push_back(Particle(x, y, z, r, pos));
 
         int i = (int)(x/dx);
         int j = (int)(y/dy);
@@ -126,28 +27,61 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
 
         if (i < 0 || j < 0 || k < 0 || i >= M || j >= N || k >= P){continue;}
 
-        phip = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-            phi[i+j*N+k*P*P], phi[i+1+j*N+k*P*P], phi[i+1+(j+1)*N+k*P*P], phi[i+(j+1)*N+k*P*P], 
-            phi[i+j*N+(k+1)*P*P], phi[i+1+j*N+(k+1)*P*P], phi[i+1+(j+1)*N+(k+1)*P*P], phi[i+(j+1)*N+(k+1)*P*P]);
+        phip = trilinearInterpolation(x, y, z, X[i], X[i+1], Y[j], Y[j+1], Z[k], Z[k+1], // feil å bruke x0?
+            phi[i+j*N+k*P*P],
+            phi[i+1+j*N+k*P*P],
+            phi[i+1+(j+1)*N+k*P*P],
+            phi[i+(j+1)*N+k*P*P],
+            phi[i+j*N+(k+1)*P*P],
+            phi[i+1+j*N+(k+1)*P*P],
+            phi[i+1+(j+1)*N+(k+1)*P*P],
+            phi[i+(j+1)*N+(k+1)*P*P]);
+
+        // bool positive;
+        // if (sign(phip) >= 0){
+        //     positive = true;
+        // } else {
+        //     positive = false;
+        // }
+
+        double phiGoal = positive*(bmin + (bmax - bmin)*distr(gen)/100.0) - (1-positive)*(bmin + (bmax - bmin)*distr(gen)/100.0);
 
         // attraction step
         for (int it = 0; it < itmax; ++it){
 
-            double Nxp = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-                normal.x[i+j*N+k*P*P], normal.x[i+1+j*N+k*P*P], normal.x[i+1+(j+1)*N+k*P*P], normal.x[i+(j+1)*N+k*P*P], 
-                normal.x[i+j*N+(k+1)*P*P],normal.x[i+1+j*N+(k+1)*P*P], normal.x[i+1+(j+1)*N+(k+1)*P*P], normal.x[i+(j+1)*N+(k+1)*P*P]);
+            double Nxp = trilinearInterpolation(x, y, z, X[i], X[i+1], Y[j], Y[j+1], Z[k], Z[k+1],
+                normal.x[i+j*N+k*P*P],
+                normal.x[i+1+j*N+k*P*P],
+                normal.x[i+1+(j+1)*N+k*P*P],
+                normal.x[i+(j+1)*N+k*P*P],
+                normal.x[i+j*N+(k+1)*P*P],
+                normal.x[i+1+j*N+(k+1)*P*P],
+                normal.x[i+1+(j+1)*N+(k+1)*P*P],
+                normal.x[i+(j+1)*N+(k+1)*P*P]);
             x = x + lambda*(phiGoal - phip)*Nxp; // from paper
             // x = x + lambda*(phip - phiGoal)*Nxp;
 
-            double Nyp = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-                normal.y[i+j*N+k*P*P], normal.y[i+1+j*N+k*P*P], normal.y[i+1+(j+1)*N+k*P*P], normal.y[i+(j+1)*N+k*P*P], 
-                normal.y[i+j*N+(k+1)*P*P], normal.y[i+1+j*N+(k+1)*P*P], normal.y[i+1+(j+1)*N+(k+1)*P*P], normal.y[i+(j+1)*N+(k+1)*P*P]);
+            double Nyp = trilinearInterpolation(x, y, z, X[i], X[i+1], Y[j], Y[j+1], Z[k], Z[k+1],
+                normal.y[i+j*N+k*P*P],
+                normal.y[i+1+j*N+k*P*P],
+                normal.y[i+1+(j+1)*N+k*P*P],
+                normal.y[i+(j+1)*N+k*P*P],
+                normal.y[i+j*N+(k+1)*P*P],
+                normal.y[i+1+j*N+(k+1)*P*P],
+                normal.y[i+1+(j+1)*N+(k+1)*P*P],
+                normal.y[i+(j+1)*N+(k+1)*P*P]);
             y = y + lambda*(phiGoal - phip)*Nyp; // from paper
             // y = y + lambda*(phip - phiGoal)*Nyp;
 
-            double Nzp = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-                normal.z[i+j*N+k*P*P], normal.z[i+1+j*N+k*P*P], normal.z[i+1+(j+1)*N+k*P*P], normal.z[i+(j+1)*N+k*P*P], 
-                normal.z[i+j*N+(k+1)*P*P],normal.z[i+1+j*N+(k+1)*P*P], normal.z[i+1+(j+1)*N+(k+1)*P*P], normal.z[i+(j+1)*N+(k+1)*P*P]);
+            double Nzp = trilinearInterpolation(x, y, z, X[i], X[i+1], Y[j], Y[j+1], Z[k], Z[k+1],
+                normal.z[i+j*N+k*P*P],
+                normal.z[i+1+j*N+k*P*P],
+                normal.z[i+1+(j+1)*N+k*P*P],
+                normal.z[i+(j+1)*N+k*P*P],
+                normal.z[i+j*N+(k+1)*P*P],
+                normal.z[i+1+j*N+(k+1)*P*P],
+                normal.z[i+1+(j+1)*N+(k+1)*P*P],
+                normal.z[i+(j+1)*N+(k+1)*P*P]);
             z = z + lambda*(phiGoal - phip)*Nzp; // from paper
             // z = z + lambda*(phip - phiGoal)*Nzp;
 
@@ -157,10 +91,16 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
 
             if (i < 0 || j < 0 || k < 0 || i >= M || j >= N || k >= P){break;}
 
-            phip = trilinearInterpolation(x, y, z, x0, x0+dx, y0, y0+dy, z0, z0+dz, 
-                phi[i+j*N+k*P*P], phi[i+1+j*N+k*P*P], phi[i+1+(j+1)*N+k*P*P], phi[i+(j+1)*N+k*P*P], 
-                phi[i+j*N+(k+1)*P*P], phi[i+1+j*N+(k+1)*P*P], phi[i+1+(j+1)*N+(k+1)*P*P], phi[i+(j+1)*N+(k+1)*P*P]);
-            
+            phip = trilinearInterpolation(x, y, z, X[i], X[i+1], Y[j], Y[j+1], Z[k], Z[k+1],
+                phi[i+j*N+k*P*P],
+                phi[i+1+j*N+k*P*P],
+                phi[i+1+(j+1)*N+k*P*P],
+                phi[i+(j+1)*N+k*P*P],
+                phi[i+j*N+(k+1)*P*P],
+                phi[i+1+j*N+(k+1)*P*P],
+                phi[i+1+(j+1)*N+(k+1)*P*P],
+                phi[i+(j+1)*N+(k+1)*P*P]);
+
             if ((positive && (phip >= bmin && phip <= bmax)) || (!positive && (phip <= -bmin && phip >= -bmax))){
                 double r;
                 if (sign(phip)*phip > rmax){
@@ -169,7 +109,7 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
                     r = rmin;
                 } else {
                     r = sign(phip)*phip;
-                }            
+                }
                 particles.push_back(Particle(x, y, z, r, positive));
                 break;
             } else {
@@ -182,14 +122,7 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
 
 vector<double> correctInterface(Particle p, double x0, double x1, double y0, double y1, double z0, double z1,
     double phi000, double phi100, double phi110, double phi010, double phi001, double phi101, double phi111, double phi011, double phip){
-    
-    // double s;
-    // if (p.positive){
-    //     s = 1.0;
-    // } else {
-    //     s = -1.0;
-    // }
-    
+
     double phip000 = sign(phip)*(p.r - sqrt(pow(x0 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
     double phip100 = sign(phip)*(p.r - sqrt(pow(x1 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
     double phip110 = sign(phip)*(p.r - sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z0 - p.z, 2)));
@@ -199,9 +132,38 @@ vector<double> correctInterface(Particle p, double x0, double x1, double y0, dou
     double phip111 = sign(phip)*(p.r - sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
     double phip011 = sign(phip)*(p.r - sqrt(pow(x0 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
 
+    // double phip000 = sign(phip)*(phip + sqrt(pow(x0 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
+    // double phip100 = sign(phip)*(phip + sqrt(pow(x1 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
+    // double phip110 = sign(phip)*(phip + sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z0 - p.z, 2)));
+    // double phip010 = sign(phip)*(phip + sqrt(pow(x0 - p.x, 2) + pow(y1 - p.y, 2) + pow(z0 - p.z, 2)));
+    // double phip001 = sign(phip)*(phip + sqrt(pow(x0 - p.x, 2) + pow(y0 - p.y, 2) + pow(z1 - p.z, 2)));
+    // double phip101 = sign(phip)*(phip + sqrt(pow(x1 - p.x, 2) + pow(y0 - p.y, 2) + pow(z1 - p.z, 2)));
+    // double phip111 = sign(phip)*(phip + sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
+    // double phip011 = sign(phip)*(phip + sqrt(pow(x0 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
+
     vector<double> phi_p;
     vector<double> phi_m;
     vector<double> phi;
+
+    // if (p.positive){
+    //     phi.push_back(max(phi000, phip000));
+    //     phi.push_back(max(phi100, phip100));
+    //     phi.push_back(max(phi110, phip110));
+    //     phi.push_back(max(phi010, phip010));
+    //     phi.push_back(max(phi001, phip001));
+    //     phi.push_back(max(phi101, phip101));
+    //     phi.push_back(max(phi111, phip111));
+    //     phi.push_back(max(phi011, phip011));
+    // } else if (!p.positive){
+    //     phi.push_back(min(phi000, phip000));
+    //     phi.push_back(min(phi100, phip100));
+    //     phi.push_back(min(phi110, phip110));
+    //     phi.push_back(min(phi010, phip010));
+    //     phi.push_back(min(phi001, phip001));
+    //     phi.push_back(min(phi101, phip101));
+    //     phi.push_back(min(phi111, phip111));
+    //     phi.push_back(min(phi011, phip011));
+    // }
 
     phi_p.push_back(max(phi000, phip000));
     phi_p.push_back(max(phi100, phip100));
@@ -246,7 +208,7 @@ double trilinearInterpolation(double x, double y, double z, double x0, double x1
 
     double c0 = c00*(1 - yd) + c10*yd;
     double c1 = c01*(1 - yd) + c11*yd;
-    
+
     return c0*(1 - zd) + c1*zd;
 }
 
