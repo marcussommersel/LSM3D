@@ -72,17 +72,6 @@ void signedDistanceField(vector<double> &arr, vector<double> x, vector<double> y
     }
 }
 
-// void signedDistanceField(double arr[], vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int P){
-//     for (int k = 0; k < P; ++k){
-//         for (int j = 0; j < N; ++j){
-//             for (int i = 0; i < M; ++i){
-//                 arr[i*M + j*N + k*O] = signedDistanceSphere(r, c, Point(x[i], y[j], z[k]));
-//                 cout << signedDistanceSphere(r, c, Point(x[i], y[j], z[k])) << endl;
-//             }
-//         }
-//     }
-// }
-
 vector<double> linspace(double start, double end, int n){
 
     vector<double> vec;

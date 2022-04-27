@@ -51,10 +51,8 @@ bool isInsideSphere(double r, Point c, Point p);
 
 double signedDistanceSphere(double r, Point c, Point p);
 
-void signedDistanceField(vector<double> &arr, vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int P); // Fix
-
-// void signedDistanceField(double arr[], vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int P);
+void signedDistanceField(vector<double> &arr, vector<double> x, vector<double> y, vector<double> z, double r, Point c, int M, int N, int P);
 
 vector<double> linspace(double start, double end, int n);
 
-void saveScalarField(string filename, vector<double> const &arr, vector<double> x, vector<double> y, vector<double> z, int M, int N, int P); // Fix
+void saveScalarField(string filename, vector<double> const &arr, vector<double> x, vector<double> y, vector<double> z, int M, int N, int P);
