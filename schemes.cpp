@@ -9,7 +9,7 @@ Derivative upwind(vector<double> &arr, vector<double> AX, vector<double> AY, vec
     for (int k = 0; k < P; ++k){
         for (int j = 0; j < N; ++j){
             for (int i = 0; i < M; ++i){
-                
+
                 if (i==0 || i==M-1 || j==0 || j==N-1 || k==0 || k==P-1){
                     phix.push_back(0);
                     phiy.push_back(0);
@@ -50,7 +50,7 @@ Derivative upwind2(vector<double> &arr, vector<double> AX, vector<double> AY, ve
     for (int k = 0; k < P; ++k){
         for (int j = 0; j < N; ++j){
             for (int i = 0; i < M; ++i){
-                
+
                 if (i==0 || i==M-1 || i==1 || i==M-2 || j==0 || j==N-1 || j==1 || j==N-2 || k==0 || k==P-1 || k==1 || k==P-2){
                     phix.push_back(0);
                     phiy.push_back(0);
@@ -75,7 +75,7 @@ Derivative upwind2(vector<double> &arr, vector<double> AX, vector<double> AY, ve
                 }
             }
         }
-    } 
+    }
     return Derivative{phix, phiy, phiz};
 }
 
@@ -111,7 +111,7 @@ Derivative weno(vector<double> &arr, vector<double> AX, vector<double> AY, vecto
                 double v2;
                 double v3;
                 double v4;
-                double v5;                
+                double v5;
 
                 {
                 if (AX[i + j*N + k*P*P] >= 0){
@@ -320,23 +320,18 @@ void TVDRK3_weno(vector<double> &arr, vector<double> AX, vector<double> AY, vect
     {
         auto [phix, phiy, phiz] = weno(n1, AX, AY, AZ, M, N, P, dx, dy, dz);
         n2 =  n1 - dt*(AX*phix + AY*phiy + AZ*phiz);
-        // vector<double>().swap(n1);
     }
 
     vector<double> n1_2 = 3.0/4*arr + 1.0/4*n2;
-    // vector<double>().swap(n2);
 
     {
         auto [phix, phiy, phiz] = weno(n1_2, AX, AY, AZ, M, N, P, dx, dy, dz);
         n3_2 =  n1_2 - dt*(AX*phix + AY*phiy + AZ*phiz);
-        // vector<double>().swap(n1_2);
     }
 
     arr = 1.0/3*arr + 2.0/3*n3_2;
-    
+
     }
-    
-    // vector<double>().swap(n3_2);
 
     for(int i = 0; i < M; ++i){
         for (int j = 0; j < N; ++j){
@@ -426,22 +421,19 @@ void TVDRK3_godunov_reinit(vector<double> &arr, vector<double> X, vector<double>
 
     {
         auto [phix, phiy, phiz] = godunov(arr, S, S, S, M, N, P, dx, dy, dz);
-        // n1 =  arr - dt*S*(vectorCBRT(phix*phix*phix + phiy*phiy*phiy + phiz*phiz*phiz) - 1.0);// feil her?
-        n1 =  arr - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0);// feil her?
+        n1 =  arr - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0);
     }
 
     {
         auto [phix, phiy, phiz] = godunov(n1, S, S, S, M, N, P, dx, dy, dz);
-        // n2 =  n1 - dt*S*(vectorCBRT(phix*phix*phix + phiy*phiy*phiy + phiz*phiz*phiz) - 1.0);// feil her?
-        n2 =  n1 - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0);// feil her? skal være ^2?
+        n2 =  n1 - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0);
     }
 
     vector<double> n1_2 = (3.0/4*arr + 1.0/4*n2);
 
     {
         auto [phix, phiy, phiz] = godunov(n1_2, S, S, S, M, N, P, dx, dy, dz);
-        // n3_2 =  n1_2 - dt*S*(vectorCBRT(phix*phix*phix + phiy*phiy*phiy + phiz*phiz*phiz) - 1.0); // feil her?
-        n3_2 =  n1_2 - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0); // feil her?
+        n3_2 =  n1_2 - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0);
     }
 
     arr = 1.0/3*arr + 2.0/3*n3_2;
@@ -537,16 +529,16 @@ void second_Order_Reinit(vector<double> &arr, vector<double> X, vector<double> Y
                     phi.push_back(arr[i+j*N+k*P*P]);
                     continue;
                 }
-                
+
                 // Nytt
-                if (arr[i + j*N + k*P*P]*arr[(i-1) + j*N + k*P*P] < 0 || arr[i + j*N + k*P*P]*arr[(i+1) + j*N + k*P*P] < 0 || 
+                if (arr[i + j*N + k*P*P]*arr[(i-1) + j*N + k*P*P] < 0 || arr[i + j*N + k*P*P]*arr[(i+1) + j*N + k*P*P] < 0 ||
                     arr[i + j*N + k*P*P]*arr[i + (j-1)*N + k*P*P] < 0 || arr[i + j*N + k*P*P]*arr[i + (j+1)*N + k*P*P] < 0 ||
                     arr[i + j*N + k*P*P]*arr[i + j*N + (k-1)*P*P] < 0 || arr[i + j*N + k*P*P]*arr[i + j*N + (k+1)*P*P] < 0){
-                    
+
                     double D = 2*dx*phi0[i+j*N+k*P*P]/cbrt(pow((phi0[(i+1)+j*N+k*P*P]-phi0[(i-1)+j*N+k*P*P]),3)
                     + pow((phi0[i+(j+1)*N+k*P*P]-phi0[i+(j-1)*N+k*P*P]),3) + pow((phi0[i+j*N+(k+1)*P*P]-phi0[i+j*N+(k-1)*P*P]),3));
                     phi.push_back(arr[i+j*N+k*P*P] - ((dt/dx)*sign(phi0[i+j*N+k*P*P])*abs(arr[i+j*N+k*P*P])-D));
-                
+
                 } else { // slutt nytt
                     double a_x, a_y, a_z, b_x, b_y, b_z;
 
@@ -587,7 +579,7 @@ void second_Order_Reinit(vector<double> &arr, vector<double> X, vector<double> Y
                             yp.push_back(arr[(i-1)+j*N+k*P*P]);
                             yp.push_back(arr[i+j*N+k*P*P]);
                             yp.push_back(0);
-                            yp.push_back(arr[(i+1)+j*N+k*P*P]);   
+                            yp.push_back(arr[(i+1)+j*N+k*P*P]);
                         }
                     } else {
                         xp.push_back(X[i-2]);
@@ -612,11 +604,11 @@ void second_Order_Reinit(vector<double> &arr, vector<double> X, vector<double> Y
                     }
                     double c_m = minMod(theta2[0], theta2[1]);
                     double c_p = minMod(theta2[1], theta2[2]);
-                    double a_x = theta1[1] + c_m*(xp[2] - xp[1]); // D_x^-phi_i 
+                    double a_x = theta1[1] + c_m*(xp[2] - xp[1]); // D_x^-phi_i
                     double b_x = theta1[2] + c_p*(xp[2] - xp[3]); // D_x^+phi_i
                     }
 
-                    {                
+                    {
 
                     // y-direction
                     vector<double> xp;
@@ -653,7 +645,7 @@ void second_Order_Reinit(vector<double> &arr, vector<double> X, vector<double> Y
                             yp.push_back(arr[i+(j-1)*N+k*P*P]);
                             yp.push_back(arr[i+j*N+k*P*P]);
                             yp.push_back(0);
-                            yp.push_back(arr[i+(j+1)*N+k*P*P]);   
+                            yp.push_back(arr[i+(j+1)*N+k*P*P]);
                         }
                     } else {
                         xp.push_back(Y[j-2]);
@@ -678,7 +670,7 @@ void second_Order_Reinit(vector<double> &arr, vector<double> X, vector<double> Y
                     }
                     double c_m = minMod(theta2[0], theta2[1]);
                     double c_p = minMod(theta2[1], theta2[2]);
-                    double a_y = theta1[1] + c_m*(xp[2] - xp[1]); // D_y^-phi_j 
+                    double a_y = theta1[1] + c_m*(xp[2] - xp[1]); // D_y^-phi_j
                     double b_y = theta1[2] + c_p*(xp[2] - xp[3]); // D_y^+phi_j
 
                     }
@@ -721,7 +713,7 @@ void second_Order_Reinit(vector<double> &arr, vector<double> X, vector<double> Y
                             yp.push_back(arr[i+j*N+(k-1)*P*P]);
                             yp.push_back(arr[i+j*N+k*P*P]);
                             yp.push_back(0);
-                            yp.push_back(arr[i+j*N+(k+1)*P*P]);   
+                            yp.push_back(arr[i+j*N+(k+1)*P*P]);
                         }
                     } else {
                         xp.push_back(Z[k-2]);
@@ -746,9 +738,9 @@ void second_Order_Reinit(vector<double> &arr, vector<double> X, vector<double> Y
                     }
                     double c_m = minMod(theta2[0], theta2[1]);
                     double c_p = minMod(theta2[1], theta2[2]);
-                    double a_z = theta1[1] + c_m*(xp[2] - xp[1]); // D_z^-phi_i 
+                    double a_z = theta1[1] + c_m*(xp[2] - xp[1]); // D_z^-phi_i
                     double b_z = theta1[2] + c_p*(xp[2] - xp[3]); // D_z^+phi_i
-                    
+
                     }
 
                     double G;
@@ -777,7 +769,7 @@ int sign(double num){
         res = 1;
     } else if (num == 0){
         res = 0;
-    } 
+    }
     return res;
 }
 

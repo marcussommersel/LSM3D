@@ -108,14 +108,6 @@ vector<double> operator-(double const &scalar, vector<double> const &vec){
     return res;
 }
 
-vector<double> vectorCBRT(vector<double> const &vec){
-    vector<double> res;
-    for (int i = 0; i < vec.size(); ++i){
-        res.push_back(cbrt(vec[i]));
-    }
-    return res;
-}
-
 vector<double> vectorAbs(vector<double> const &vec){
     vector<double> res;
     for (unsigned int i = 0; i < vec.size(); ++i){
@@ -145,10 +137,3 @@ vector<double> vectorSqrt(vector<double> const &vec){
     }
     return res;
 }
-
-// vector<double> vectorSign(vector<double> const &vec){
-//     vector<double> s;
-//     for (unsigned int i = 0; i < vec.size(); ++i){
-//         if (vec)
-//     }
-// }
