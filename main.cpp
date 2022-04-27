@@ -16,9 +16,9 @@ int main(){
 
     cout << "Program start." << endl;
 
-    const int m = 128;
-    const int n = 128; 
-    const int p = 128;
+    const int m = 50;
+    const int n = 50; 
+    const int p = 50;
 
     const double xStart = 0.0;
     const double xEnd = 1.0;
@@ -39,7 +39,7 @@ int main(){
     int reinitSteps = 5;
     bool doReinit = true;
     bool doParticle = true;
-    bool saveParticles = true;
+    bool saveParticles = false;
     int nParticles = 64;
     int reinitFreq = 1;
     int plotFreq = 100;
@@ -75,6 +75,9 @@ int main(){
     signedDistanceField(phi, x, y, z, r, c, m, n, p);
 
     double initialVolume = volume(phi, dx, dy, dz); 
+    double initialSurfaceArea = surfaceArea(phi, dx, dy, dz, m, n, p);
+    vector<double> phi0 = phi;
+    cout << "Initial surface area: " << initialSurfaceArea << endl;
     vector<string> plotTimes;
     vector<string> plotTimesParticle;
     
@@ -217,8 +220,8 @@ int main(){
                     particles.erase(particles.begin() + a);
                 }
                 // interface correction
-                // else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)  && (abs(phip) > particles[a].r)){ // correct interface
-                else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)){ // correct interface, worked
+                else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)  && (abs(phip) > particles[a].r)){ // correct interface
+                // else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)){ // correct interface, worked
                     vector<double> phiCorrected = 
                         correctInterface(particles[a], x[i], x[i+1], y[j], y[j+1], z[k], z[k+1],
                         phi[(i)+(j)*n+(k)*p*p], 
@@ -327,6 +330,7 @@ int main(){
 
     double endVolume = volume(phi, dx, dy, dz);
     double volumeChange = 100*(endVolume-initialVolume)/initialVolume;
+    double L1Error = interfaceError(phi0, phi, dx, dy, dz, m, n, p);
 
     saveScalarField(savePath + to_string(T) + ".txt", phi, x, y, z, m, n, p);
     plotTimes.push_back(savePath + to_string(T));
@@ -366,6 +370,8 @@ int main(){
         file << "Initial volume: " << initialVolume << endl;
         file << "End volume: " << endVolume << endl;
         file << "Volume change: " << volumeChange << " %" << endl; 
+        file << "Initial surface area: " << initialSurfaceArea << endl;
+        file << "Interface error: " << L1Error << endl;
         file.close();
     }
 
