@@ -20,7 +20,8 @@ public:
 // vector<Particle> initializeParticles(double x0, double y0, double z0, double dx, double dy, double dz, vector<double> &phi, Derivative &normal,
 //     int i, int j, int k, int M, int N, int P, int numParticles);
 
-vector<Particle> initializeParticles(double x0, double y0, double z0, double dx, double dy, double dz, vector<double> &phi, Derivative &normal,
+vector<Particle> initializeParticles(double x0, double y0, double z0, double dx, double dy, double dz,
+    vector<double> &X, vector<double> &Y, vector<double> &Z, vector<double> &phi, Derivative &normal,
     int M, int N, int P, int numParticles);
 
 vector<double> correctInterface(Particle p, double x0, double x1, double y0, double y1, double z0, double z1,
