@@ -4,11 +4,10 @@
 #include <chrono>
 #include <fstream>
 #include "initialization.h"
-#include "initializationTests.h"
 #include "schemes.h"
-#include "schemesTest.h"
 #include "vectorUtilities.h"
 #include "particleLSM.h"
+#include "testCases.h"
 using namespace std;
 
 int main(){ 
@@ -17,9 +16,9 @@ int main(){
 
     cout << "Program start." << endl;
 
-    const int m = 50;
-    const int n = 50; 
-    const int p = 50;
+    const int m = 128;
+    const int n = 128; 
+    const int p = 128;
 
     const double xStart = 0.0;
     const double xEnd = 1.0;
@@ -43,13 +42,14 @@ int main(){
     bool saveParticles = true;
     int nParticles = 64;
     int reinitFreq = 1;
-    int plotFreq = 200;
+    int plotFreq = 100;
     int reseedFreq = 100;
     int itmax = 2000;
     double CFL = 0.9;
     bool halfplot = true;
     string testcase = "vortex";
     // string testcase = "sheared";
+    // string testcase = "simple";
     string savePath = "figures/";
 
     Point c;
@@ -218,7 +218,7 @@ int main(){
                 }
                 // interface correction
                 // else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)  && (abs(phip) > particles[a].r)){ // correct interface
-                else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)){ // correct interface
+                else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)){ // correct interface, worked
                     vector<double> phiCorrected = 
                         correctInterface(particles[a], x[i], x[i+1], y[j], y[j+1], z[k], z[k+1],
                         phi[(i)+(j)*n+(k)*p*p], 
