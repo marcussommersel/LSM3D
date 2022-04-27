@@ -50,6 +50,7 @@ int main(){
     bool halfplot = true;
     string testcase = "vortex";
     // string testcase = "sheared";
+    string savePath = "figures/";
 
     Point c;
     double r;
@@ -77,8 +78,8 @@ int main(){
     vector<string> plotTimes;
     vector<string> plotTimesParticle;
     
-    saveScalarField(to_string(0.000000) + ".txt", phi, x, y, z, m, n, p);
-    plotTimes.push_back(to_string(0.000000));
+    saveScalarField(savePath + to_string(0.000000) + ".txt", phi, x, y, z, m, n, p);
+    plotTimes.push_back(savePath + to_string(0.000000));
 
 
     vector<Particle> particles;
@@ -106,8 +107,8 @@ int main(){
         cout << "Initialization finished." << endl;
 
         if (saveParticles){
-            plotParticles(to_string(0.000000) + "particle.txt" , particles);
-            plotTimesParticle.push_back(to_string(0.000000) + "particle");
+            plotParticles(savePath + to_string(0.000000) + "particle.txt" , particles);
+            plotTimesParticle.push_back(savePath + to_string(0.000000) + "particle");
         }
     }
 
@@ -298,19 +299,19 @@ int main(){
         }
         if (it%plotFreq == 0){
             cout << "Saving scalar field." << endl;
-            saveScalarField(to_string(t) + ".txt", phi, x, y, z, m, n, p);
-            plotTimes.push_back(to_string(t));
+            saveScalarField(savePath + to_string(t) + ".txt", phi, x, y, z, m, n, p);
+            plotTimes.push_back(savePath + to_string(t));
 
             if (doParticle && saveParticles){
-                plotParticles(to_string(t) + "particle.txt" , particles);
-                plotTimesParticle.push_back(to_string(t) + "particle");
+                plotParticles(savePath + to_string(t) + "particle.txt" , particles);
+                plotTimesParticle.push_back(savePath + to_string(t) + "particle");
             }
             cout << "Done saving." << endl;
         }
 
         if (t/T > 0.5 && halfplot){
-            saveScalarField(to_string(t) + ".txt", phi, x, y, z, m, n, p);
-            plotTimes.push_back(to_string(t));
+            saveScalarField(savePath + to_string(t) + ".txt", phi, x, y, z, m, n, p);
+            plotTimes.push_back(savePath + to_string(t));
             halfplot = false;
         }
 
@@ -324,17 +325,17 @@ int main(){
     double endVolume = volume(phi, dx, dy, dz);
     double volumeChange = 100*(endVolume-initialVolume)/initialVolume;
 
-    saveScalarField(to_string(T) + ".txt", phi, x, y, z, m, n, p);
-    plotTimes.push_back(to_string(T));
+    saveScalarField(savePath + to_string(T) + ".txt", phi, x, y, z, m, n, p);
+    plotTimes.push_back(savePath + to_string(T));
 
     if (doParticle && saveParticles){
-        plotParticles(to_string(t) + "particle.txt" , particles);
-        plotTimesParticle.push_back(to_string(t) + "particle");
+        plotParticles(savePath + to_string(t) + "particle.txt" , particles);
+        plotTimesParticle.push_back(savePath + to_string(t) + "particle");
     }
 
     {
         ofstream file;
-        file.open("plotTimes.txt");
+        file.open(savePath + "plotTimes.txt");
         if (!file.is_open()){cerr << "could not open file." << endl;}
         for (int i = 0; i < plotTimes.size(); ++i){
             file << plotTimes[i] << endl;
@@ -344,7 +345,7 @@ int main(){
 
     if (doParticle && saveParticles){
         ofstream file;
-        file.open("plotTimesParticle.txt");
+        file.open(savePath + "plotTimesParticle.txt");
         if (!file.is_open()){cerr << "could not open file." << endl;}
         for (int i = 0; i < plotTimesParticle.size(); ++i){
             file << plotTimesParticle[i] << endl;
@@ -354,7 +355,7 @@ int main(){
 
     {
         ofstream file;
-        file.open("log.txt");
+        file.open(savePath + "log.txt");
         if (!file.is_open()){cerr << "could not open file." << endl;}
         file << "Iterations: " << numIt << endl;
         chrono::steady_clock::time_point currentTime = chrono::steady_clock::now();
