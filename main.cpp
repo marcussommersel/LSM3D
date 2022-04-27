@@ -19,22 +19,6 @@ int main(){
 
     cout << "Program start." << endl;
 
-    bool runTests = false;
-
-    if (runTests)
-    {
-        // minDistTest();
-        // interceptsTest();
-        // isInsideTest();
-        // signedDistanceTest();
-        // simple2DAdvectionTest();
-        // cubeTest();
-        // isInsideSphereTest();
-        // signedDistanceSphereTest();
-        // signedDistanceFieldTest();
-        // euler_upwindTest();
-    }
-
     const int m = 50;
     const int n = 50; 
     const int p = 50;
@@ -95,7 +79,6 @@ int main(){
     vector<string> plotTimes;
     vector<string> plotTimesParticle;
     
-
     saveScalarField(to_string(0.000000) + ".txt", phi, x, y, z, m, n, p);
     plotTimes.push_back(to_string(0.000000));
 
