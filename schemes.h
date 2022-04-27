@@ -6,7 +6,6 @@
 #include <functional>
 #include <cmath>
 #include "vectorUtilities.h"
-#include "Eigen/Dense"
 
 using namespace std;
 
@@ -15,15 +14,6 @@ struct Derivative {
     vector<double> y;
     vector<double> z;
 };
-
-// struct oneSidedDerivative {
-//     vector<double> xm;
-//     vector<double> xp;
-//     vector<double> ym;
-//     vector<double> yp;
-//     vector<double> zm;
-//     vector<double> zp;
-// };
 
 Derivative upwind(vector<double> &arr, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int N, int P, double dx, double dy, double dz);
 
