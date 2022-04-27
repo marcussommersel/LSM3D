@@ -506,46 +506,25 @@ void euler_upwind_reinit(vector<double> &arr, int M, int N, int P, double dx, do
                     phi.push_back(arr[i+j*N+k*P*P]);
                     continue;
                 }
-                if (arr[i + j*N + k*P*P]*arr[(i-1) + j*N + k*P*P] < 0 || arr[i + j*N + k*P*P]*arr[(i+1) + j*N + k*P*P] < 0 || 
-                    arr[i + j*N + k*P*P]*arr[i + (j-1)*N + k*P*P] < 0 || arr[i + j*N + k*P*P]*arr[i + (j+1)*N + k*P*P] < 0 ||
-                    arr[i + j*N + k*P*P]*arr[i + j*N + (k-1)*P*P] < 0 || arr[i + j*N + k*P*P]*arr[i + j*N + (k+1)*P*P] < 0){
-                        double D = 2*dx*phi0[i+j*N+k*P*P]/sqrt(pow((phi0[(i+1)+j*N+k*P*P]-phi0[(i-1)+j*N+k*P*P]),2)
-                        + pow((phi0[i+(j+1)*N+k*P*P]-phi0[i+(j-1)*N+k*P*P]),2) + pow((phi0[i+j*N+(k+1)*P*P]-phi0[i+j*N+(k-1)*P*P]),2));
-                        phi.push_back(arr[i+j*N+k*P*P] - ((dt/dx)*sign(phi0[i+j*N+k*P*P])*abs(arr[i+j*N+k*P*P])-D));
-                } else {
-                    double a = (arr[i+j*N+k*P*P]-arr[(i-1)+j*N+k*P*P])/dx; // Disse må endres for høyere orden?
-                    double b = (arr[(i+1)+j*N+k*P*P]-arr[i+j*N+k*P*P])/dx;
-                    double c = (arr[i+j*N+k*P*P]-arr[i+(j-1)*N+k*P*P])/dy;
-                    double d = (arr[i+(j+1)*N+k*P*P]-arr[i+j*N+k*P*P])/dy;
-                    double e = (arr[i+j*N+k*P*P]-arr[i+j*N+(k-1)*P*P])/dz;
-                    double f = (arr[i+j*N+(k+1)*P*P]-arr[i+j*N+k*P*P])/dz;
 
-                    // double a = (3*arr[i+j*N+k*P*P] - 4*arr[i-1+j*N+k*P*P] + arr[i-2+j*N+k*P*P])/(2*dx);
-                    // double b = (-arr[i+2+j*N+k*P*P] + 4*arr[i+1+j*N+k*P*P] - 3*arr[i+j*N+k*P*P])/(2*dx);
-                    // double c = (3*arr[i+j*N+k*P*P] - 4*arr[i+(j-1)*N+k*P*P] + arr[i+(j-2)*N+k*P*P])/(2*dy);
-                    // double d = (-arr[i+(j+2)*N+k*P*P] + 4*arr[i+(j+1)*N+k*P*P] - 3*arr[i+j*N+k*P*P])/(2*dy);
-                    // double e = (3*arr[i+j*N+k*P*P] - 4*arr[i+j*N+(k-1)*P*P] + arr[i+j*N+(k-2)*P*P])/(2*dz);
-                    // double f = (-arr[i+j*N+(k+2)*P*P] + 4*arr[i+j*N+(k+1)*P*P] - 3*arr[i+j*N+k*P*P])/(2*dz);
+                double a = (arr[i+j*N+k*P*P]-arr[(i-1)+j*N+k*P*P])/dx;
+                double b = (arr[(i+1)+j*N+k*P*P]-arr[i+j*N+k*P*P])/dx;
+                double c = (arr[i+j*N+k*P*P]-arr[i+(j-1)*N+k*P*P])/dy;
+                double d = (arr[i+(j+1)*N+k*P*P]-arr[i+j*N+k*P*P])/dy;
+                double e = (arr[i+j*N+k*P*P]-arr[i+j*N+(k-1)*P*P])/dz;
+                double f = (arr[i+j*N+(k+1)*P*P]-arr[i+j*N+k*P*P])/dz;
 
-                    // double a = (10*arr[i+j*N+k*P*P] - 15*arr[i-1+j*N+k*P*P] + 6*arr[i-2+j*N+k*P*P] - arr[i-3+j*N+k*P*P])/(6*dx);
-                    // double b = -(10*arr[i+j*N+k*P*P] - 15*arr[i+1+j*N+k*P*P] + 6*arr[i+2+j*N+k*P*P] - arr[i+3+j*N+k*P*P])/(6*dx);
-                    // double c = (10*arr[i+j*N+k*P*P] - 15*arr[i+(j-1)*N+k*P*P] + 6*arr[i+(j-2)*N+k*P*P] - arr[i+(j-3)*N+k*P*P])/(6*dy);
-                    // double d = -(10*arr[i+j*N+k*P*P] - 15*arr[i+(j+1)*N+k*P*P] + 6*arr[i+(j+2)*N+k*P*P] - arr[i+(j+3)*N+k*P*P])/(6*dy);
-                    // double e = (10*arr[i+j*N+k*P*P] - 15*arr[i+j*N+(k-1)*P*P] + 6*arr[i+j*N+(k-2)*P*P] - arr[i+j*N+(k-3)*P*P])/(6*dz);
-                    // double f = -(10*arr[i+j*N+k*P*P] - 15*arr[i+j*N+(k+1)*P*P] + 6*arr[i+j*N+(k+2)*P*P] - arr[i+j*N+(k+3)*P*P])/(6*dz);
-
-                    double G;
-                    if (phi0[i+j*N+k*P*P] > 0){
-                        G = sqrt(max(max(a,0.0)*max(a,0.0), min(b,0.0)*min(b,0.0)) // Skal det være sqrt her?
-                            + max(max(c,0.0)*max(c,0.0), min(d,0.0)*min(d,0.0))
-                            + max(max(e,0.0)*max(e,0.0), min(f,0.0)*min(f,0.0))) - 1;
-                    } else if (phi0[i+j*N+k*P*P] < 0){
-                        G = sqrt(max(min(a,0.0)*min(a,0.0), max(b,0.0)*max(b,0.0))
-                        + max(min(c,0.0)*min(c,0.0), max(d,0.0)*max(d,0.0))
-                        + max(min(e,0.0)*min(e,0.0), max(f,0.0)*max(f,0.0))) - 1;
-                    }
-                    phi.push_back(arr[i + j*N + k*P*P] - dt*sign(phi0[i+j*N+k*P*P])*G);
+                double G;
+                if (phi0[i+j*N+k*P*P] > 0){
+                    G = sqrt(max(max(a,0.0)*max(a,0.0), min(b,0.0)*min(b,0.0))
+                        + max(max(c,0.0)*max(c,0.0), min(d,0.0)*min(d,0.0))
+                        + max(max(e,0.0)*max(e,0.0), min(f,0.0)*min(f,0.0))) - 1;
+                } else if (phi0[i+j*N+k*P*P] < 0){
+                    G = sqrt(max(min(a,0.0)*min(a,0.0), max(b,0.0)*max(b,0.0))
+                    + max(min(c,0.0)*min(c,0.0), max(d,0.0)*max(d,0.0))
+                    + max(min(e,0.0)*min(e,0.0), max(f,0.0)*max(f,0.0))) - 1;
                 }
+                phi.push_back(arr[i + j*N + k*P*P] - dt*sign(phi0[i+j*N+k*P*P])*G);
             }
         }
     }
@@ -826,15 +805,16 @@ double minMod(double a, double b){
 }
 
 double interfaceInterpolation(double xm2, double xm1, double x1, double x2, double phim2, double phim1, double phi1, double phi2){
-    Eigen::Matrix4d A;
-    Eigen::Vector4d b;
-    A << pow(phim2, 3), pow(phim2, 2), phim2, 1,
-        pow(phim1, 3), pow(phim1, 2), phim1, 1,
-        pow(phi1, 3), pow(phi1, 2), phi1, 1,
-        pow(phi2, 3), pow(phi2, 2), phi2, 1;
-    b << xm2, xm1, x1, x2;
-    Eigen::Vector4d x = A.colPivHouseholderQr().solve(b);
-    return x[3];
+    // Eigen::Matrix4d A;
+    // Eigen::Vector4d b;
+    // A << pow(phim2, 3), pow(phim2, 2), phim2, 1,
+    //     pow(phim1, 3), pow(phim1, 2), phim1, 1,
+    //     pow(phi1, 3), pow(phi1, 2), phi1, 1,
+    //     pow(phi2, 3), pow(phi2, 2), phi2, 1;
+    // b << xm2, xm1, x1, x2;
+    // Eigen::Vector4d x = A.colPivHouseholderQr().solve(b);
+    // return x[3];
+    return 0;
 }
 
 Derivative fourth_order_reinit(vector<double> &arr, vector<double> AX, vector<double> AY, vector<double> AZ, vector<double> X, vector<double> Y, vector<double> Z, int M, int N, int P, double dx, double dy, double dz, const vector<double> &phi0){
