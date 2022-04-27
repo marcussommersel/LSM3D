@@ -40,7 +40,3 @@ int sign(double num);
 double minAbs(double a, double b);
 
 double minMod(double a, double b);
-
-double interfaceInterpolation(double xm2, double xm1, double x1, double x2, double phim2, double phim1, double phi1, double phi2);
-
-Derivative fourth_order_reinit(vector<double> &arr, vector<double> AX, vector<double> AY, vector<double> AZ, vector<double> X, vector<double> Y, vector<double> Z, int M, int N, int P, double dx, double dy, double dz, const vector<double> &phi0);
