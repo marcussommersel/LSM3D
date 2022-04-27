@@ -3,8 +3,6 @@
 #include <ctime>
 #include <chrono>
 #include <fstream>
-#include "initialization2D.h"
-#include "initialization2DTests.h"
 #include "initialization.h"
 #include "initializationTests.h"
 #include "schemes.h"
