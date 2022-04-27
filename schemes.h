@@ -33,10 +33,4 @@ void TVDRK3_godunov_reinit(vector<double> &arr, vector<double> X, vector<double>
 
 void euler_upwind_reinit(vector<double> &arr, int M, int N, int P, double dx, double dy, double dz, double dt, const vector<double> &phi0);
 
-void second_Order_Reinit(vector<double> &arr, vector<double> X, vector<double> Y, vector<double> Z, int M, int N, int P, double dx, double dy, double dz, double dt, const vector<double> &phi0);
-
 int sign(double num);
-
-double minAbs(double a, double b);
-
-double minMod(double a, double b);
