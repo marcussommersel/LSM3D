@@ -435,7 +435,7 @@ void TVDRK3_godunov_reinit(vector<double> &arr, vector<double> X, vector<double>
         // auto [phix, phiy, phiz] = godunov(n1, S, S, S, M, N, P, dx, dy, dz);
         auto [phix, phiy, phiz] = fourth_order_reinit(n1, S, S, S, X, Y, Z, M, N, P, dx, dy, dz, phi0);
         // n2 =  n1 - dt*S*(vectorCBRT(phix*phix*phix + phiy*phiy*phiy + phiz*phiz*phiz) - 1.0);// feil her?
-        n2 =  n1 - dt*S*(vectorSqrt(phix + phiy + phiz) - 1.0);// feil her?
+        n2 =  n1 - dt*S*(vectorSqrt(phix + phiy + phiz) - 1.0);// feil her? skal være ^2?
     }
 
     vector<double> n1_2 = (3.0/4*arr + 1.0/4*n2);
