@@ -335,47 +335,26 @@ void TVDRK3_weno(vector<double> &arr, vector<double> AX, vector<double> AY, vect
 
     for(int i = 0; i < M; ++i){
         for (int j = 0; j < N; ++j){
-            // arr[2 + i*N + j*P*P] = arr[3 + i*N + j*P*P] - (arr[4 + i*N + j*P*P] - arr[3 + i*N + j*P*P]);
-            // arr[1 + i*N + j*P*P] = arr[2 + i*N + j*P*P] - (arr[3 + i*N + j*P*P] - arr[2 + i*N + j*P*P]);
-            // arr[0 + i*N + j*P*P] = arr[1 + i*N + j*P*P] - (arr[2 + i*N + j*P*P] - arr[1 + i*N + j*P*P]);
-            // arr[(M-3) + i*N + j*P*P] = arr[(M-4) + i*N + j*P*P] - (arr[(M-5) + i*N + j*P*P] - arr[(M-4) + i*N + j*P*P]);
-            // arr[(M-2) + i*N + j*P*P] = arr[(M-3) + i*N + j*P*P] - (arr[(M-4) + i*N + j*P*P] - arr[(M-3) + i*N + j*P*P]);
-            // arr[(M-1) + i*N + j*P*P] = arr[(M-2) + i*N + j*P*P] - (arr[(M-3) + i*N + j*P*P] - arr[(M-2) + i*N + j*P*P]);
+            arr[2 + i*N + j*P*P] = arr[3 + i*N + j*P*P] - (arr[4 + i*N + j*P*P] - arr[3 + i*N + j*P*P]);
+            arr[1 + i*N + j*P*P] = arr[2 + i*N + j*P*P] - (arr[3 + i*N + j*P*P] - arr[2 + i*N + j*P*P]);
+            arr[0 + i*N + j*P*P] = arr[1 + i*N + j*P*P] - (arr[2 + i*N + j*P*P] - arr[1 + i*N + j*P*P]);
+            arr[(M-3) + i*N + j*P*P] = arr[(M-4) + i*N + j*P*P] - (arr[(M-5) + i*N + j*P*P] - arr[(M-4) + i*N + j*P*P]);
+            arr[(M-2) + i*N + j*P*P] = arr[(M-3) + i*N + j*P*P] - (arr[(M-4) + i*N + j*P*P] - arr[(M-3) + i*N + j*P*P]);
+            arr[(M-1) + i*N + j*P*P] = arr[(M-2) + i*N + j*P*P] - (arr[(M-3) + i*N + j*P*P] - arr[(M-2) + i*N + j*P*P]);
 
-            // arr[j + (2)*N + i*P*P] = arr[j + (3)*N + i*P*P] - (arr[j + (4)*N + i*P*P] - arr[j + (3)*N + i*P*P]);
-            // arr[j + (1)*N + i*P*P] = arr[j + (2)*N + i*P*P] - (arr[j + (3)*N + i*P*P] - arr[j + (2)*N + i*P*P]);
-            // arr[j + (0)*N + i*P*P] = arr[j + (1)*N + i*P*P] - (arr[j + (2)*N + i*P*P] - arr[j + (1)*N + i*P*P]);
-            // arr[j + (N-3)*N + i*P*P] = arr[j + (N-4)*N + i*P*P] - (arr[j + (N-5)*N + i*P*P] - arr[j + (N-4)*N + i*P*P]);
-            // arr[j + (N-2)*N + i*P*P] = arr[j + (N-3)*N + i*P*P] - (arr[j + (N-4)*N + i*P*P] - arr[j + (N-3)*N + i*P*P]);
-            // arr[j + (N-1)*N + i*P*P] = arr[j + (N-2)*N + i*P*P] - (arr[j + (N-3)*N + i*P*P] - arr[j + (N-2)*N + i*P*P]);
+            arr[j + (2)*N + i*P*P] = arr[j + (3)*N + i*P*P] - (arr[j + (4)*N + i*P*P] - arr[j + (3)*N + i*P*P]);
+            arr[j + (1)*N + i*P*P] = arr[j + (2)*N + i*P*P] - (arr[j + (3)*N + i*P*P] - arr[j + (2)*N + i*P*P]);
+            arr[j + (0)*N + i*P*P] = arr[j + (1)*N + i*P*P] - (arr[j + (2)*N + i*P*P] - arr[j + (1)*N + i*P*P]);
+            arr[j + (N-3)*N + i*P*P] = arr[j + (N-4)*N + i*P*P] - (arr[j + (N-5)*N + i*P*P] - arr[j + (N-4)*N + i*P*P]);
+            arr[j + (N-2)*N + i*P*P] = arr[j + (N-3)*N + i*P*P] - (arr[j + (N-4)*N + i*P*P] - arr[j + (N-3)*N + i*P*P]);
+            arr[j + (N-1)*N + i*P*P] = arr[j + (N-2)*N + i*P*P] - (arr[j + (N-3)*N + i*P*P] - arr[j + (N-2)*N + i*P*P]);
 
-            // arr[j + i*N + (2)*P*P] = arr[j + i*N + (3)*P*P] - (arr[j + i*N + (4)*P*P] - arr[j + i*N + (3)*P*P]);
-            // arr[j + i*N + (1)*P*P] = arr[j + i*N + (2)*P*P] - (arr[j + i*N + (3)*P*P] - arr[j + i*N + (2)*P*P]);
-            // arr[j + i*N + (0)*P*P] = arr[j + i*N + (1)*P*P] - (arr[j + i*N + (2)*P*P] - arr[j + i*N + (1)*P*P]);
-            // arr[j + i*N + (N-3)*P*P] = arr[j + i*N + (N-4)*P*P] - (arr[j + i*N + (N-5)*P*P] - arr[j + i*N + (N-4)*P*P]);
-            // arr[j + i*N + (N-2)*P*P] = arr[j + i*N + (N-3)*P*P] - (arr[j + i*N + (N-4)*P*P] - arr[j + i*N + (N-3)*P*P]);
-            // arr[j + i*N + (N-1)*P*P] = arr[j + i*N + (N-2)*P*P] - (arr[j + i*N + (N-3)*P*P] - arr[j + i*N + (N-2)*P*P]);
-
-            arr[2 + i*N + j*P*P] = arr[3 + i*N + j*P*P] + (arr[4 + i*N + j*P*P] - arr[3 + i*N + j*P*P]);
-            arr[1 + i*N + j*P*P] = arr[2 + i*N + j*P*P] + (arr[3 + i*N + j*P*P] - arr[2 + i*N + j*P*P]);
-            arr[0 + i*N + j*P*P] = arr[1 + i*N + j*P*P] + (arr[2 + i*N + j*P*P] - arr[1 + i*N + j*P*P]);
-            arr[(M-3) + i*N + j*P*P] = arr[(M-4) + i*N + j*P*P] + (arr[(M-5) + i*N + j*P*P] - arr[(M-4) + i*N + j*P*P]);
-            arr[(M-2) + i*N + j*P*P] = arr[(M-3) + i*N + j*P*P] + (arr[(M-4) + i*N + j*P*P] - arr[(M-3) + i*N + j*P*P]);
-            arr[(M-1) + i*N + j*P*P] = arr[(M-2) + i*N + j*P*P] + (arr[(M-3) + i*N + j*P*P] - arr[(M-2) + i*N + j*P*P]);
-
-            arr[j + (2)*N + i*P*P] = arr[j + (3)*N + i*P*P] + (arr[j + (4)*N + i*P*P] - arr[j + (3)*N + i*P*P]);
-            arr[j + (1)*N + i*P*P] = arr[j + (2)*N + i*P*P] + (arr[j + (3)*N + i*P*P] - arr[j + (2)*N + i*P*P]);
-            arr[j + (0)*N + i*P*P] = arr[j + (1)*N + i*P*P] + (arr[j + (2)*N + i*P*P] - arr[j + (1)*N + i*P*P]);
-            arr[j + (N-3)*N + i*P*P] = arr[j + (N-4)*N + i*P*P] + (arr[j + (N-5)*N + i*P*P] - arr[j + (N-4)*N + i*P*P]);
-            arr[j + (N-2)*N + i*P*P] = arr[j + (N-3)*N + i*P*P] + (arr[j + (N-4)*N + i*P*P] - arr[j + (N-3)*N + i*P*P]);
-            arr[j + (N-1)*N + i*P*P] = arr[j + (N-2)*N + i*P*P] + (arr[j + (N-3)*N + i*P*P] - arr[j + (N-2)*N + i*P*P]);
-
-            arr[j + i*N + (2)*P*P] = arr[j + i*N + (3)*P*P] + (arr[j + i*N + (4)*P*P] - arr[j + i*N + (3)*P*P]);
-            arr[j + i*N + (1)*P*P] = arr[j + i*N + (2)*P*P] + (arr[j + i*N + (3)*P*P] - arr[j + i*N + (2)*P*P]);
-            arr[j + i*N + (0)*P*P] = arr[j + i*N + (1)*P*P] + (arr[j + i*N + (2)*P*P] - arr[j + i*N + (1)*P*P]);
-            arr[j + i*N + (N-3)*P*P] = arr[j + i*N + (N-4)*P*P] + (arr[j + i*N + (N-5)*P*P] - arr[j + i*N + (N-4)*P*P]);
-            arr[j + i*N + (N-2)*P*P] = arr[j + i*N + (N-3)*P*P] + (arr[j + i*N + (N-4)*P*P] - arr[j + i*N + (N-3)*P*P]);
-            arr[j + i*N + (N-1)*P*P] = arr[j + i*N + (N-2)*P*P] + (arr[j + i*N + (N-3)*P*P] - arr[j + i*N + (N-2)*P*P]);
+            arr[j + i*N + (2)*P*P] = arr[j + i*N + (3)*P*P] - (arr[j + i*N + (4)*P*P] - arr[j + i*N + (3)*P*P]);
+            arr[j + i*N + (1)*P*P] = arr[j + i*N + (2)*P*P] - (arr[j + i*N + (3)*P*P] - arr[j + i*N + (2)*P*P]);
+            arr[j + i*N + (0)*P*P] = arr[j + i*N + (1)*P*P] - (arr[j + i*N + (2)*P*P] - arr[j + i*N + (1)*P*P]);
+            arr[j + i*N + (N-3)*P*P] = arr[j + i*N + (N-4)*P*P] - (arr[j + i*N + (N-5)*P*P] - arr[j + i*N + (N-4)*P*P]);
+            arr[j + i*N + (N-2)*P*P] = arr[j + i*N + (N-3)*P*P] - (arr[j + i*N + (N-4)*P*P] - arr[j + i*N + (N-3)*P*P]);
+            arr[j + i*N + (N-1)*P*P] = arr[j + i*N + (N-2)*P*P] - (arr[j + i*N + (N-3)*P*P] - arr[j + i*N + (N-2)*P*P]);
 
         }
     }
@@ -439,49 +418,28 @@ void TVDRK3_godunov_reinit(vector<double> &arr, vector<double> X, vector<double>
     arr = 1.0/3*arr + 2.0/3*n3_2;
 
     for(int i = 0; i < M; ++i){
-        for (int j = 0; j < N; ++j){ // feil under
-            arr[2 + i*N + j*P*P] = arr[3 + i*N + j*P*P] + (arr[4 + i*N + j*P*P] - arr[3 + i*N + j*P*P]);
-            arr[1 + i*N + j*P*P] = arr[2 + i*N + j*P*P] + (arr[3 + i*N + j*P*P] - arr[2 + i*N + j*P*P]);
-            arr[0 + i*N + j*P*P] = arr[1 + i*N + j*P*P] + (arr[2 + i*N + j*P*P] - arr[1 + i*N + j*P*P]);
-            arr[(M-3) + i*N + j*P*P] = arr[(M-4) + i*N + j*P*P] + (arr[(M-5) + i*N + j*P*P] - arr[(M-4) + i*N + j*P*P]);
-            arr[(M-2) + i*N + j*P*P] = arr[(M-3) + i*N + j*P*P] + (arr[(M-4) + i*N + j*P*P] - arr[(M-3) + i*N + j*P*P]);
-            arr[(M-1) + i*N + j*P*P] = arr[(M-2) + i*N + j*P*P] + (arr[(M-3) + i*N + j*P*P] - arr[(M-2) + i*N + j*P*P]);
+        for (int j = 0; j < N; ++j){
 
-            arr[j + (2)*N + i*P*P] = arr[j + (3)*N + i*P*P] + (arr[j + (4)*N + i*P*P] - arr[j + (3)*N + i*P*P]);
-            arr[j + (1)*N + i*P*P] = arr[j + (2)*N + i*P*P] + (arr[j + (3)*N + i*P*P] - arr[j + (2)*N + i*P*P]);
-            arr[j + (0)*N + i*P*P] = arr[j + (1)*N + i*P*P] + (arr[j + (2)*N + i*P*P] - arr[j + (1)*N + i*P*P]);
-            arr[j + (N-3)*N + i*P*P] = arr[j + (N-4)*N + i*P*P] + (arr[j + (N-5)*N + i*P*P] - arr[j + (N-4)*N + i*P*P]);
-            arr[j + (N-2)*N + i*P*P] = arr[j + (N-3)*N + i*P*P] + (arr[j + (N-4)*N + i*P*P] - arr[j + (N-3)*N + i*P*P]);
-            arr[j + (N-1)*N + i*P*P] = arr[j + (N-2)*N + i*P*P] + (arr[j + (N-3)*N + i*P*P] - arr[j + (N-2)*N + i*P*P]);
+            arr[2 + i*N + j*P*P] = arr[3 + i*N + j*P*P] - (arr[4 + i*N + j*P*P] - arr[3 + i*N + j*P*P]);
+            arr[1 + i*N + j*P*P] = arr[2 + i*N + j*P*P] - (arr[3 + i*N + j*P*P] - arr[2 + i*N + j*P*P]);
+            arr[0 + i*N + j*P*P] = arr[1 + i*N + j*P*P] - (arr[2 + i*N + j*P*P] - arr[1 + i*N + j*P*P]);
+            arr[(M-3) + i*N + j*P*P] = arr[(M-4) + i*N + j*P*P] - (arr[(M-5) + i*N + j*P*P] - arr[(M-4) + i*N + j*P*P]);
+            arr[(M-2) + i*N + j*P*P] = arr[(M-3) + i*N + j*P*P] - (arr[(M-4) + i*N + j*P*P] - arr[(M-3) + i*N + j*P*P]);
+            arr[(M-1) + i*N + j*P*P] = arr[(M-2) + i*N + j*P*P] - (arr[(M-3) + i*N + j*P*P] - arr[(M-2) + i*N + j*P*P]);
 
-            arr[j + i*N + (2)*P*P] = arr[j + i*N + (3)*P*P] + (arr[j + i*N + (4)*P*P] - arr[j + i*N + (3)*P*P]);
-            arr[j + i*N + (1)*P*P] = arr[j + i*N + (2)*P*P] + (arr[j + i*N + (3)*P*P] - arr[j + i*N + (2)*P*P]);
-            arr[j + i*N + (0)*P*P] = arr[j + i*N + (1)*P*P] + (arr[j + i*N + (2)*P*P] - arr[j + i*N + (1)*P*P]);
-            arr[j + i*N + (N-3)*P*P] = arr[j + i*N + (N-4)*P*P] + (arr[j + i*N + (N-5)*P*P] - arr[j + i*N + (N-4)*P*P]);
-            arr[j + i*N + (N-2)*P*P] = arr[j + i*N + (N-3)*P*P] + (arr[j + i*N + (N-4)*P*P] - arr[j + i*N + (N-3)*P*P]);
-            arr[j + i*N + (N-1)*P*P] = arr[j + i*N + (N-2)*P*P] + (arr[j + i*N + (N-3)*P*P] - arr[j + i*N + (N-2)*P*P]);
+            arr[j + (2)*N + i*P*P] = arr[j + (3)*N + i*P*P] - (arr[j + (4)*N + i*P*P] - arr[j + (3)*N + i*P*P]);
+            arr[j + (1)*N + i*P*P] = arr[j + (2)*N + i*P*P] - (arr[j + (3)*N + i*P*P] - arr[j + (2)*N + i*P*P]);
+            arr[j + (0)*N + i*P*P] = arr[j + (1)*N + i*P*P] - (arr[j + (2)*N + i*P*P] - arr[j + (1)*N + i*P*P]);
+            arr[j + (N-3)*N + i*P*P] = arr[j + (N-4)*N + i*P*P] - (arr[j + (N-5)*N + i*P*P] - arr[j + (N-4)*N + i*P*P]);
+            arr[j + (N-2)*N + i*P*P] = arr[j + (N-3)*N + i*P*P] - (arr[j + (N-4)*N + i*P*P] - arr[j + (N-3)*N + i*P*P]);
+            arr[j + (N-1)*N + i*P*P] = arr[j + (N-2)*N + i*P*P] - (arr[j + (N-3)*N + i*P*P] - arr[j + (N-2)*N + i*P*P]);
 
-
-            // arr[2 + i*N + j*P*P] = arr[3 + i*N + j*P*P] - (arr[4 + i*N + j*P*P] - arr[3 + i*N + j*P*P]);
-            // arr[1 + i*N + j*P*P] = arr[2 + i*N + j*P*P] - (arr[3 + i*N + j*P*P] - arr[2 + i*N + j*P*P]);
-            // arr[0 + i*N + j*P*P] = arr[1 + i*N + j*P*P] - (arr[2 + i*N + j*P*P] - arr[1 + i*N + j*P*P]);
-            // arr[(M-3) + i*N + j*P*P] = arr[(M-4) + i*N + j*P*P] - (arr[(M-5) + i*N + j*P*P] - arr[(M-4) + i*N + j*P*P]);
-            // arr[(M-2) + i*N + j*P*P] = arr[(M-3) + i*N + j*P*P] - (arr[(M-4) + i*N + j*P*P] - arr[(M-3) + i*N + j*P*P]);
-            // arr[(M-1) + i*N + j*P*P] = arr[(M-2) + i*N + j*P*P] - (arr[(M-3) + i*N + j*P*P] - arr[(M-2) + i*N + j*P*P]);
-
-            // arr[j + (2)*N + i*P*P] = arr[j + (3)*N + i*P*P] - (arr[j + (4)*N + i*P*P] - arr[j + (3)*N + i*P*P]);
-            // arr[j + (1)*N + i*P*P] = arr[j + (2)*N + i*P*P] - (arr[j + (3)*N + i*P*P] - arr[j + (2)*N + i*P*P]);
-            // arr[j + (0)*N + i*P*P] = arr[j + (1)*N + i*P*P] - (arr[j + (2)*N + i*P*P] - arr[j + (1)*N + i*P*P]);
-            // arr[j + (N-3)*N + i*P*P] = arr[j + (N-4)*N + i*P*P] - (arr[j + (N-5)*N + i*P*P] - arr[j + (N-4)*N + i*P*P]);
-            // arr[j + (N-2)*N + i*P*P] = arr[j + (N-3)*N + i*P*P] - (arr[j + (N-4)*N + i*P*P] - arr[j + (N-3)*N + i*P*P]);
-            // arr[j + (N-1)*N + i*P*P] = arr[j + (N-2)*N + i*P*P] - (arr[j + (N-3)*N + i*P*P] - arr[j + (N-2)*N + i*P*P]);
-
-            // arr[j + i*N + (2)*P*P] = arr[j + i*N + (3)*P*P] - (arr[j + i*N + (4)*P*P] - arr[j + i*N + (3)*P*P]);
-            // arr[j + i*N + (1)*P*P] = arr[j + i*N + (2)*P*P] - (arr[j + i*N + (3)*P*P] - arr[j + i*N + (2)*P*P]);
-            // arr[j + i*N + (0)*P*P] = arr[j + i*N + (1)*P*P] - (arr[j + i*N + (2)*P*P] - arr[j + i*N + (1)*P*P]);
-            // arr[j + i*N + (N-3)*P*P] = arr[j + i*N + (N-4)*P*P] - (arr[j + i*N + (N-5)*P*P] - arr[j + i*N + (N-4)*P*P]);
-            // arr[j + i*N + (N-2)*P*P] = arr[j + i*N + (N-3)*P*P] - (arr[j + i*N + (N-4)*P*P] - arr[j + i*N + (N-3)*P*P]);
-            // arr[j + i*N + (N-1)*P*P] = arr[j + i*N + (N-2)*P*P] - (arr[j + i*N + (N-3)*P*P] - arr[j + i*N + (N-2)*P*P]);
+            arr[j + i*N + (2)*P*P] = arr[j + i*N + (3)*P*P] - (arr[j + i*N + (4)*P*P] - arr[j + i*N + (3)*P*P]);
+            arr[j + i*N + (1)*P*P] = arr[j + i*N + (2)*P*P] - (arr[j + i*N + (3)*P*P] - arr[j + i*N + (2)*P*P]);
+            arr[j + i*N + (0)*P*P] = arr[j + i*N + (1)*P*P] - (arr[j + i*N + (2)*P*P] - arr[j + i*N + (1)*P*P]);
+            arr[j + i*N + (N-3)*P*P] = arr[j + i*N + (N-4)*P*P] - (arr[j + i*N + (N-5)*P*P] - arr[j + i*N + (N-4)*P*P]);
+            arr[j + i*N + (N-2)*P*P] = arr[j + i*N + (N-3)*P*P] - (arr[j + i*N + (N-4)*P*P] - arr[j + i*N + (N-3)*P*P]);
+            arr[j + i*N + (N-1)*P*P] = arr[j + i*N + (N-2)*P*P] - (arr[j + i*N + (N-3)*P*P] - arr[j + i*N + (N-2)*P*P]);
         }
     }
 }
