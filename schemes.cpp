@@ -390,58 +390,106 @@ void euler_weno(vector<double> &arr, vector<double> AX, vector<double> AY, vecto
     }
 }
 
-void TVDRK3_godunov_reinit(vector<double> &arr, vector<double> X, vector<double> Y, vector<double> Z, int M, int N, int P, double dx, double dy, double dz, double dt, vector<double> phi0){
+void TVDRK3_godunov_reinit(vector<double> &arr, int M, int N, int P, double dx, double dy, double dz, double dt, vector<double> phi0){
 
     vector<double> n1;
     vector<double> n2;
     vector<double> n3_2;
 
-    vector<double> S = phi0/(vectorSqrt(phi0*phi0 + max(max(dx,dy),dz)*max(max(dx,dy),dz)));
+    for (int k = 0; k < P; ++k){
+        for (int j = 0; j < N; ++j){
+            for (int i = 0; i < M; ++i){
+                if (i==0 || i==(M-1) || i==1 || i==M-2 || i==2 || i==M-3 || j==0 || j==(N-1) || j==1 || j==N-2 || j==2 || j==N-3 || k==0 || k==(P-1) || k==1 || k==P-2 || k==2 || k==P-3){
+                    n1.push_back(arr[i+j*N+k*P*P]);
+                    continue;
+                }
 
-    {
-        auto [phix, phiy, phiz] = godunov(arr, S, S, S, M, N, P, dx, dy, dz);
-        n1 =  arr - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0);
+                double a = (arr[i+j*N+k*P*P]-arr[(i-1)+j*N+k*P*P])/dx;
+                double b = (arr[(i+1)+j*N+k*P*P]-arr[i+j*N+k*P*P])/dx;
+                double c = (arr[i+j*N+k*P*P]-arr[i+(j-1)*N+k*P*P])/dy;
+                double d = (arr[i+(j+1)*N+k*P*P]-arr[i+j*N+k*P*P])/dy;
+                double e = (arr[i+j*N+k*P*P]-arr[i+j*N+(k-1)*P*P])/dz;
+                double f = (arr[i+j*N+(k+1)*P*P]-arr[i+j*N+k*P*P])/dz;
+
+                double G;
+                if (phi0[i+j*N+k*P*P] > 0){
+                    G = sqrt(max(max(a,0.0)*max(a,0.0), min(b,0.0)*min(b,0.0))
+                        + max(max(c,0.0)*max(c,0.0), min(d,0.0)*min(d,0.0))
+                        + max(max(e,0.0)*max(e,0.0), min(f,0.0)*min(f,0.0))) - 1;
+                } else if (phi0[i+j*N+k*P*P] < 0){
+                    G = sqrt(max(min(a,0.0)*min(a,0.0), max(b,0.0)*max(b,0.0))
+                    + max(min(c,0.0)*min(c,0.0), max(d,0.0)*max(d,0.0))
+                    + max(min(e,0.0)*min(e,0.0), max(f,0.0)*max(f,0.0))) - 1;
+                }
+                n1.push_back(arr[i + j*N + k*P*P] - dt*sign(phi0[i+j*N+k*P*P])*G);
+            }
+        }
     }
 
-    {
-        auto [phix, phiy, phiz] = godunov(n1, S, S, S, M, N, P, dx, dy, dz);
-        n2 =  n1 - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0);
+    for (int k = 0; k < P; ++k){
+        for (int j = 0; j < N; ++j){
+            for (int i = 0; i < M; ++i){
+                if (i==0 || i==(M-1) || i==1 || i==M-2 || i==2 || i==M-3 || j==0 || j==(N-1) || j==1 || j==N-2 || j==2 || j==N-3 || k==0 || k==(P-1) || k==1 || k==P-2 || k==2 || k==P-3){
+                    n2.push_back(n1[i+j*N+k*P*P]);
+                    continue;
+                }
+
+                double a = (n1[i+j*N+k*P*P]-n1[(i-1)+j*N+k*P*P])/dx;
+                double b = (n1[(i+1)+j*N+k*P*P]-n1[i+j*N+k*P*P])/dx;
+                double c = (n1[i+j*N+k*P*P]-n1[i+(j-1)*N+k*P*P])/dy;
+                double d = (n1[i+(j+1)*N+k*P*P]-n1[i+j*N+k*P*P])/dy;
+                double e = (n1[i+j*N+k*P*P]-n1[i+j*N+(k-1)*P*P])/dz;
+                double f = (n1[i+j*N+(k+1)*P*P]-n1[i+j*N+k*P*P])/dz;
+
+                double G;
+                if (phi0[i+j*N+k*P*P] > 0){
+                    G = sqrt(max(max(a,0.0)*max(a,0.0), min(b,0.0)*min(b,0.0))
+                        + max(max(c,0.0)*max(c,0.0), min(d,0.0)*min(d,0.0))
+                        + max(max(e,0.0)*max(e,0.0), min(f,0.0)*min(f,0.0))) - 1;
+                } else if (phi0[i+j*N+k*P*P] < 0){
+                    G = sqrt(max(min(a,0.0)*min(a,0.0), max(b,0.0)*max(b,0.0))
+                    + max(min(c,0.0)*min(c,0.0), max(d,0.0)*max(d,0.0))
+                    + max(min(e,0.0)*min(e,0.0), max(f,0.0)*max(f,0.0))) - 1;
+                }
+                n2.push_back(n1[i + j*N + k*P*P] - dt*sign(phi0[i+j*N+k*P*P])*G);
+            }
+        }
     }
 
     vector<double> n1_2 = (3.0/4*arr + 1.0/4*n2);
 
-    {
-        auto [phix, phiy, phiz] = godunov(n1_2, S, S, S, M, N, P, dx, dy, dz);
-        n3_2 =  n1_2 - dt*S*(vectorSqrt(phix*phix + phiy*phiy + phiz*phiz) - 1.0);
+    for (int k = 0; k < P; ++k){
+        for (int j = 0; j < N; ++j){
+            for (int i = 0; i < M; ++i){
+                if (i==0 || i==(M-1) || i==1 || i==M-2 || i==2 || i==M-3 || j==0 || j==(N-1) || j==1 || j==N-2 || j==2 || j==N-3 || k==0 || k==(P-1) || k==1 || k==P-2 || k==2 || k==P-3){
+                    n3_2.push_back(n1_2[i+j*N+k*P*P]);
+                    continue;
+                }
+
+                double a = (n1_2[i+j*N+k*P*P]-n1_2[(i-1)+j*N+k*P*P])/dx;
+                double b = (n1_2[(i+1)+j*N+k*P*P]-n1_2[i+j*N+k*P*P])/dx;
+                double c = (n1_2[i+j*N+k*P*P]-n1_2[i+(j-1)*N+k*P*P])/dy;
+                double d = (n1_2[i+(j+1)*N+k*P*P]-n1_2[i+j*N+k*P*P])/dy;
+                double e = (n1_2[i+j*N+k*P*P]-n1_2[i+j*N+(k-1)*P*P])/dz;
+                double f = (n1_2[i+j*N+(k+1)*P*P]-n1_2[i+j*N+k*P*P])/dz;
+
+                double G;
+                if (phi0[i+j*N+k*P*P] > 0){
+                    G = sqrt(max(max(a,0.0)*max(a,0.0), min(b,0.0)*min(b,0.0))
+                        + max(max(c,0.0)*max(c,0.0), min(d,0.0)*min(d,0.0))
+                        + max(max(e,0.0)*max(e,0.0), min(f,0.0)*min(f,0.0))) - 1;
+                } else if (phi0[i+j*N+k*P*P] < 0){
+                    G = sqrt(max(min(a,0.0)*min(a,0.0), max(b,0.0)*max(b,0.0))
+                    + max(min(c,0.0)*min(c,0.0), max(d,0.0)*max(d,0.0))
+                    + max(min(e,0.0)*min(e,0.0), max(f,0.0)*max(f,0.0))) - 1;
+                }
+                n3_2.push_back(n1_2[i + j*N + k*P*P] - dt*sign(phi0[i+j*N+k*P*P])*G);
+            }
+        }
     }
 
     arr = 1.0/3*arr + 2.0/3*n3_2;
 
-    for(int i = 0; i < M; ++i){
-        for (int j = 0; j < N; ++j){
-
-            arr[2 + i*N + j*P*P] = arr[3 + i*N + j*P*P] - (arr[4 + i*N + j*P*P] - arr[3 + i*N + j*P*P]);
-            arr[1 + i*N + j*P*P] = arr[2 + i*N + j*P*P] - (arr[3 + i*N + j*P*P] - arr[2 + i*N + j*P*P]);
-            arr[0 + i*N + j*P*P] = arr[1 + i*N + j*P*P] - (arr[2 + i*N + j*P*P] - arr[1 + i*N + j*P*P]);
-            arr[(M-3) + i*N + j*P*P] = arr[(M-4) + i*N + j*P*P] - (arr[(M-5) + i*N + j*P*P] - arr[(M-4) + i*N + j*P*P]);
-            arr[(M-2) + i*N + j*P*P] = arr[(M-3) + i*N + j*P*P] - (arr[(M-4) + i*N + j*P*P] - arr[(M-3) + i*N + j*P*P]);
-            arr[(M-1) + i*N + j*P*P] = arr[(M-2) + i*N + j*P*P] - (arr[(M-3) + i*N + j*P*P] - arr[(M-2) + i*N + j*P*P]);
-
-            arr[j + (2)*N + i*P*P] = arr[j + (3)*N + i*P*P] - (arr[j + (4)*N + i*P*P] - arr[j + (3)*N + i*P*P]);
-            arr[j + (1)*N + i*P*P] = arr[j + (2)*N + i*P*P] - (arr[j + (3)*N + i*P*P] - arr[j + (2)*N + i*P*P]);
-            arr[j + (0)*N + i*P*P] = arr[j + (1)*N + i*P*P] - (arr[j + (2)*N + i*P*P] - arr[j + (1)*N + i*P*P]);
-            arr[j + (N-3)*N + i*P*P] = arr[j + (N-4)*N + i*P*P] - (arr[j + (N-5)*N + i*P*P] - arr[j + (N-4)*N + i*P*P]);
-            arr[j + (N-2)*N + i*P*P] = arr[j + (N-3)*N + i*P*P] - (arr[j + (N-4)*N + i*P*P] - arr[j + (N-3)*N + i*P*P]);
-            arr[j + (N-1)*N + i*P*P] = arr[j + (N-2)*N + i*P*P] - (arr[j + (N-3)*N + i*P*P] - arr[j + (N-2)*N + i*P*P]);
-
-            arr[j + i*N + (2)*P*P] = arr[j + i*N + (3)*P*P] - (arr[j + i*N + (4)*P*P] - arr[j + i*N + (3)*P*P]);
-            arr[j + i*N + (1)*P*P] = arr[j + i*N + (2)*P*P] - (arr[j + i*N + (3)*P*P] - arr[j + i*N + (2)*P*P]);
-            arr[j + i*N + (0)*P*P] = arr[j + i*N + (1)*P*P] - (arr[j + i*N + (2)*P*P] - arr[j + i*N + (1)*P*P]);
-            arr[j + i*N + (N-3)*P*P] = arr[j + i*N + (N-4)*P*P] - (arr[j + i*N + (N-5)*P*P] - arr[j + i*N + (N-4)*P*P]);
-            arr[j + i*N + (N-2)*P*P] = arr[j + i*N + (N-3)*P*P] - (arr[j + i*N + (N-4)*P*P] - arr[j + i*N + (N-3)*P*P]);
-            arr[j + i*N + (N-1)*P*P] = arr[j + i*N + (N-2)*P*P] - (arr[j + i*N + (N-3)*P*P] - arr[j + i*N + (N-2)*P*P]);
-        }
-    }
 }
 
 void euler_upwind_reinit(vector<double> &arr, int M, int N, int P, double dx, double dy, double dz, double dt, const vector<double> &phi0){

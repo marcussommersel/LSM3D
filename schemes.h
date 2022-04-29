@@ -29,7 +29,7 @@ void TVDRK3_weno(vector<double> &arr, vector<double> AX, vector<double> AY, vect
 
 void euler_weno(vector<double> &arr, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int N, int P, double dx, double dy, double dz, double dt);
 
-void TVDRK3_godunov_reinit(vector<double> &arr, vector<double> X, vector<double> Y, vector<double> Z, int M, int N, int P, double dx, double dy, double dz, double dt, vector<double> phi0);
+void TVDRK3_godunov_reinit(vector<double> &arr, int M, int N, int P, double dx, double dy, double dz, double dt, vector<double> phi0);
 
 void euler_upwind_reinit(vector<double> &arr, int M, int N, int P, double dx, double dy, double dz, double dt, const vector<double> &phi0);
 
