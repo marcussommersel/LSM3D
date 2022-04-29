@@ -45,7 +45,7 @@ int main(){
     int plotFreq = 100;
     int reseedFreq = 100;
     int itmax = 2000;
-    double CFL = 0.9;
+    double CFL = 0.5;
     bool halfplot = true;
     string testcase = "vortex";
     // string testcase = "sheared";
@@ -75,7 +75,6 @@ int main(){
     signedDistanceField(phi, x, y, z, r, c, m, n, p);
 
     double initialVolume = volume(phi, dx, dy, dz); 
-    double initialSurfaceArea = surfaceArea(phi, dx, dy, dz, m, n, p);
     vector<double> phi0 = phi;
     double MError0 = massError(phi, dx, dy, dz, m, n, p);
     double MError = 0;
@@ -222,8 +221,8 @@ int main(){
                     particles.erase(particles.begin() + a);
                 }
                 // interface correction
-                else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)  && (abs(phip) > particles[a].r)){ // correct interface
-                // else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)){ // correct interface, worked
+                else if ((phip < 0 && particles[a].positive) || (phip > 0 && !particles[a].positive)  && (abs(phip) > particles[a].r)){
+    
                     vector<double> phiCorrected = 
                         correctInterface(particles[a], x[i], x[i+1], y[j], y[j+1], z[k], z[k+1],
                         phi[(i)+(j)*n+(k)*p*p], 
@@ -246,6 +245,27 @@ int main(){
                     phi[(i)+(j+1)*n+(k+1)*p*p] = phiCorrected[7];
                         
                 }
+
+                phip = trilinearInterpolation(particles[a].x, particles[a].y, particles[a].z, 
+                    x[i], x[i+1], y[j], y[j+1], z[k], z[k+1], 
+                    phi[i+j*n+k*p*p], 
+                    phi[(i+1)+j*n+k*p*p], 
+                    phi[(i+1)+(j+1)*n+k*p*p], 
+                    phi[i+(j+1)*n+k*p*p], 
+                    phi[i+j*n+(k+1)*p*p], 
+                    phi[(i+1)+j*n+(k+1)*p*p], 
+                    phi[(i+1)+(j+1)*n+(k+1)*p*p], 
+                    phi[i+(j+1)*n+(k+1)*p*p]);
+
+                // Adjust radius
+                if (sign(phip)*phip > rmax){
+                    particles[a].r = rmax;
+                } else if (sign(phip)*phip < rmin){
+                    particles[a].r = rmin;
+                } else {
+                    particles[a].r = sign(phip)*phip;
+                }
+
             }
 
             // Initialize new particles
@@ -295,7 +315,8 @@ int main(){
         if (doReinit && (it%reinitFreq == 0)){
             vector<double> phi0 = phi;
             for (int i = 0; i < reinitSteps - 1; ++i){
-                euler_upwind_reinit(phi, m, n, p, dx, dy, dz, dtau, phi0);
+                // euler_upwind_reinit(phi, m, n, p, dx, dy, dz, dtau, phi0);
+                TVDRK3_godunov_reinit(phi, m, n, p, dx, dy, dz, dtau, phi0);
             }
         }
 
@@ -382,7 +403,6 @@ int main(){
         file << "Initial volume: " << initialVolume << endl;
         file << "End volume: " << endVolume << endl;
         file << "Volume change: " << volumeChange << " %" << endl; 
-        file << "Initial surface area: " << initialSurfaceArea << endl;
         file << "Interface error: " << L1Error << endl;
         file << "Average area error: " << MError << endl;
         file.close();
