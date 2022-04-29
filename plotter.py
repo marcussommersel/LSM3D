@@ -50,7 +50,6 @@ def plotParticle(filename):
     y = []
     z = []
 
-    count = 0
     for line in f.readlines():
         parsedLine = line.split(',')
         x.append(float(parsedLine[0]))
