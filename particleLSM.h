@@ -27,14 +27,6 @@ vector<double> correctInterface(Particle p, double x0, double x1, double y0, dou
 double trilinearInterpolation(double x, double y, double z, double x0, double x1, double y0, double y1, double z0, double z1,
     double c000, double c100, double c110, double c010, double c001, double c101, double c111, double c011);
 
-bool particleCompareX(Particle p1, Particle p2);
-
-bool particleCompareY(Particle p1, Particle p2);
-
-bool particleCompareZ(Particle p1, Particle p2);
-
-void sortParticles(vector<Particle> &p, int M, int N);
-
 Derivative normal(vector<double> &arr, double dx, double dy, double dz, double M, double N, double P);
 
 void plotParticles(string filename, vector<Particle> particles);

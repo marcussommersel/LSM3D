@@ -37,13 +37,6 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
             phi[i+1+(j+1)*N+(k+1)*P*P],
             phi[i+(j+1)*N+(k+1)*P*P]);
 
-        // bool positive;
-        // if (sign(phip) >= 0){
-        //     positive = true;
-        // } else {
-        //     positive = false;
-        // }
-
         double phiGoal = positive*(bmin + (bmax - bmin)*distr(gen)/100.0) - (1-positive)*(bmin + (bmax - bmin)*distr(gen)/100.0);
 
         // attraction step
@@ -58,8 +51,7 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
                 normal.x[i+1+j*N+(k+1)*P*P],
                 normal.x[i+1+(j+1)*N+(k+1)*P*P],
                 normal.x[i+(j+1)*N+(k+1)*P*P]);
-            x = x + lambda*(phiGoal - phip)*Nxp; // from paper
-            // x = x + lambda*(phip - phiGoal)*Nxp;
+            x = x + lambda*(phiGoal - phip)*Nxp;
 
             double Nyp = trilinearInterpolation(x, y, z, X[i], X[i+1], Y[j], Y[j+1], Z[k], Z[k+1],
                 normal.y[i+j*N+k*P*P],
@@ -70,8 +62,7 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
                 normal.y[i+1+j*N+(k+1)*P*P],
                 normal.y[i+1+(j+1)*N+(k+1)*P*P],
                 normal.y[i+(j+1)*N+(k+1)*P*P]);
-            y = y + lambda*(phiGoal - phip)*Nyp; // from paper
-            // y = y + lambda*(phip - phiGoal)*Nyp;
+            y = y + lambda*(phiGoal - phip)*Nyp;
 
             double Nzp = trilinearInterpolation(x, y, z, X[i], X[i+1], Y[j], Y[j+1], Z[k], Z[k+1],
                 normal.z[i+j*N+k*P*P],
@@ -82,8 +73,7 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
                 normal.z[i+1+j*N+(k+1)*P*P],
                 normal.z[i+1+(j+1)*N+(k+1)*P*P],
                 normal.z[i+(j+1)*N+(k+1)*P*P]);
-            z = z + lambda*(phiGoal - phip)*Nzp; // from paper
-            // z = z + lambda*(phip - phiGoal)*Nzp;
+            z = z + lambda*(phiGoal - phip)*Nzp;
 
             i = (int)(x/dx);
             j = (int)(y/dy);
@@ -132,38 +122,9 @@ vector<double> correctInterface(Particle p, double x0, double x1, double y0, dou
     double phip111 = sign(phip)*(p.r - sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
     double phip011 = sign(phip)*(p.r - sqrt(pow(x0 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
 
-    // double phip000 = sign(phip)*(phip + sqrt(pow(x0 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
-    // double phip100 = sign(phip)*(phip + sqrt(pow(x1 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
-    // double phip110 = sign(phip)*(phip + sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z0 - p.z, 2)));
-    // double phip010 = sign(phip)*(phip + sqrt(pow(x0 - p.x, 2) + pow(y1 - p.y, 2) + pow(z0 - p.z, 2)));
-    // double phip001 = sign(phip)*(phip + sqrt(pow(x0 - p.x, 2) + pow(y0 - p.y, 2) + pow(z1 - p.z, 2)));
-    // double phip101 = sign(phip)*(phip + sqrt(pow(x1 - p.x, 2) + pow(y0 - p.y, 2) + pow(z1 - p.z, 2)));
-    // double phip111 = sign(phip)*(phip + sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
-    // double phip011 = sign(phip)*(phip + sqrt(pow(x0 - p.x, 2) + pow(y1 - p.y, 2) + pow(z1 - p.z, 2)));
-
     vector<double> phi_p;
     vector<double> phi_m;
     vector<double> phi;
-
-    // if (p.positive){
-    //     phi.push_back(max(phi000, phip000));
-    //     phi.push_back(max(phi100, phip100));
-    //     phi.push_back(max(phi110, phip110));
-    //     phi.push_back(max(phi010, phip010));
-    //     phi.push_back(max(phi001, phip001));
-    //     phi.push_back(max(phi101, phip101));
-    //     phi.push_back(max(phi111, phip111));
-    //     phi.push_back(max(phi011, phip011));
-    // } else if (!p.positive){
-    //     phi.push_back(min(phi000, phip000));
-    //     phi.push_back(min(phi100, phip100));
-    //     phi.push_back(min(phi110, phip110));
-    //     phi.push_back(min(phi010, phip010));
-    //     phi.push_back(min(phi001, phip001));
-    //     phi.push_back(min(phi101, phip101));
-    //     phi.push_back(min(phi111, phip111));
-    //     phi.push_back(min(phi011, phip011));
-    // }
 
     phi_p.push_back(max(phi000, phip000));
     phi_p.push_back(max(phi100, phip100));
@@ -244,28 +205,6 @@ Derivative normal(vector<double> &arr, double dx, double dy, double dz, double M
         }
     }
     return Derivative{Nx, Ny, Nz};
-}
-
-bool particleCompareX(Particle p1, Particle p2){
-    return (p1.x < p2.x);
-}
-
-bool particleCompareY(Particle p1, Particle p2){
-    return (p1.y < p2.y);
-}
-
-bool particleCompareZ(Particle p1, Particle p2){
-    return (p1.z < p2.z);
-}
-
-void sortParticles(vector<Particle> &p, int M, int N){
-    sort(p.begin(), p.end(), particleCompareZ);
-    for (int i = 0; i < N-1; ++i){
-        sort(p.begin() + i*N*N, p.begin() + (i+1)*N*N, particleCompareY);
-        for (int i = 0; i < M-1; ++i){
-            sort(p.begin() + i*M, p.begin() + (i+1)*M, particleCompareX);
-        }
-    }
 }
 
 void plotParticles(string filename, vector<Particle> particles){
