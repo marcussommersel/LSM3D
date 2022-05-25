@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "initialization.h"
+#include "schemes.h"
 
 using namespace std;
 

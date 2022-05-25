@@ -27,12 +27,8 @@ Velocity shearedSphereVelocity(int M, int N, int P, vector<double> X, vector<dou
     for (int k = 0; k < P; ++k){
         for (int j = 0; j < N; ++j){
             for (int i = 0; i < M; ++i){
-                // U.push_back(sin(PI*X[i])*cos(PI*Y[j])*cos(PI*t/T)); // Morgan et al.
-                // V.push_back(-cos(PI*X[i])*sin(PI*Y[j])*cos(PI*t/T));
-                // W.push_back(0.0);
-
-                U.push_back(-2*sin(PI*X[i])*sin(PI*X[i])*sin(PI*Y[j])*cos(PI*Y[j])*cos(PI*t/T)); // Rider and Kothe
-                V.push_back(2*sin(PI*Y[j])*sin(PI*Y[j])*sin(PI*X[i])*cos(PI*X[i])*cos(PI*t/T));
+                U.push_back(sin(PI*X[i])*cos(PI*Y[j])*cos(PI*t/T));
+                V.push_back(-cos(PI*X[i])*sin(PI*Y[j])*cos(PI*t/T));
                 W.push_back(0.0);
             }
         }
