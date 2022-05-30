@@ -1,5 +1,6 @@
 #include "schemes.h"
 
+// first-order upwind scheme
 Derivative upwind(vector<double> &phi, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int N, int P, double dx, double dy, double dz){
 
     vector<double> phix;
@@ -41,6 +42,7 @@ Derivative upwind(vector<double> &phi, vector<double> AX, vector<double> AY, vec
     return Derivative{phix, phiy, phiz};
 }
 
+// WENO scheme. Third-order accurate and fifth-order accurate in smooth regions
 Derivative weno(vector<double> &phi, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int const N, int const P, double dx, double dy, double dz){
 
     vector<double> phix;
@@ -186,6 +188,7 @@ Derivative weno(vector<double> &phi, vector<double> AX, vector<double> AY, vecto
     return Derivative{phix, phiy, phiz};
 }
 
+// Godunov scheme used for the reinitialization equation
 Derivative godunov(vector<double> &phi, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int const N, int const P, double dx, double dy, double dz){
 
     vector<double> phix;
@@ -235,11 +238,13 @@ Derivative godunov(vector<double> &phi, vector<double> AX, vector<double> AY, ve
     return Derivative{phix, phiy, phiz};
 }
 
+// first-order explicit Euler scheme used with the upwind scheme
 void euler_upwind(vector<double> &phi, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int N, int P, double dx, double dy, double dz, double dt){
     auto [phix, phiy, phiz] = upwind(phi, AX, AY, AZ, M, N, P, dx, dy, dz);
     phi = phi - dt*(AX*phix + AY*phiy + AZ*phiz);
 }
 
+// third-order TVDRK scheme used with the upwind scheme
 void TVDRK3_upwind(vector<double> &phi, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int N, int P, double dx, double dy, double dz, double dt){
 
     vector<double> n1;
@@ -267,6 +272,7 @@ void TVDRK3_upwind(vector<double> &phi, vector<double> AX, vector<double> AY, ve
 
 }
 
+// third-order TVDRK scheme used with the WENO scheme
 void TVDRK3_weno(vector<double> &phi, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int N, int P, double dx, double dy, double dz, double dt){
 
     {
@@ -322,6 +328,7 @@ void TVDRK3_weno(vector<double> &phi, vector<double> AX, vector<double> AY, vect
     }
 }
 
+// first-order explicit Euler scheme used with the weno scheme
 void euler_weno(vector<double> &phi, vector<double> AX, vector<double> AY, vector<double> AZ, int M, int N, int P, double dx, double dy, double dz, double dt){
     auto [phix, phiy, phiz] = weno(phi, AX, AY, AZ, M, N, P, dx, dy, dz);
     phi = phi - dt*(AX*phix + AY*phiy + AZ*phiz);
@@ -352,6 +359,7 @@ void euler_weno(vector<double> &phi, vector<double> AX, vector<double> AY, vecto
     }
 }
 
+// third-order TVDRK scheme used with the Godunov scheme to solve the reinitialization equation
 void TVDRK3_godunov_reinit(vector<double> &phi, int M, int N, int P, double dx, double dy, double dz, double dt, vector<double> phi0){
 
     vector<double> n1;
@@ -454,7 +462,8 @@ void TVDRK3_godunov_reinit(vector<double> &phi, int M, int N, int P, double dx, 
 
 }
 
-void euler_upwind_reinit(vector<double> &phi, int M, int N, int P, double dx, double dy, double dz, double dt, const vector<double> &phi0){
+// first-order explicit Euler scheme used with the Godunov scheme to solve the reinitialization equation
+void euler_godunov_reinit(vector<double> &phi, int M, int N, int P, double dx, double dy, double dz, double dt, const vector<double> &phi0){
     vector<double> phiNew;
     for (int k = 0; k < P; ++k){
         for (int j = 0; j < N; ++j){
@@ -488,6 +497,7 @@ void euler_upwind_reinit(vector<double> &phi, int M, int N, int P, double dx, do
     phi = phiNew;
 }
 
+// sign function that returns 1 for a positive value, -1 for a negative value, and 0 for a value of 0
 int sign(double num){
     int res;
     if (num < 0){
