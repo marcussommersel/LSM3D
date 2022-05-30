@@ -1,5 +1,6 @@
 #include "vectorUtilities.h"
 
+// multiplies the elements of two vectors
 vector<double> operator*(vector<double> const &vec1, vector<double> const &vec2){
     vector<double> res;
     if (vec1.size() != vec2.size()){
@@ -11,6 +12,7 @@ vector<double> operator*(vector<double> const &vec1, vector<double> const &vec2)
     return res;
 }
 
+// divides the elements of one vector with another vector
 vector<double> operator/(vector<double> const &vec1, vector<double> const &vec2){
     vector<double> res;
     if (vec1.size() != vec2.size()){
@@ -22,6 +24,7 @@ vector<double> operator/(vector<double> const &vec1, vector<double> const &vec2)
     return res;
 }
 
+// adds the elements of two vectors
 vector<double> operator+(vector<double> const &vec1, vector<double> const &vec2){
     vector<double> res;
     if (vec1.size() != vec2.size()){
@@ -33,6 +36,7 @@ vector<double> operator+(vector<double> const &vec1, vector<double> const &vec2)
     return res;
 }
 
+// multiplies the elements of a vector with a scalar
 vector<double> operator*(double const &scalar, vector<double> const &vec){
     vector<double> res;
     for (int i = 0; i < vec.size(); ++i){
@@ -41,6 +45,7 @@ vector<double> operator*(double const &scalar, vector<double> const &vec){
     return res;
 }
 
+// multiplies the elements of a vector with a scalar
 vector<double> operator*(vector<double> const &vec, double const &scalar){
     vector<double> res;
     for (int i = 0; i < vec.size(); ++i){
@@ -49,6 +54,7 @@ vector<double> operator*(vector<double> const &vec, double const &scalar){
     return res;
 }
 
+// divides the elements of a vector with a scalar
 vector<double> operator/(vector<double> const &vec, double const &scalar){
     vector<double> res;
     for (int i = 0; i < vec.size(); ++i){
@@ -57,6 +63,7 @@ vector<double> operator/(vector<double> const &vec, double const &scalar){
     return res;
 }
 
+// divides a scalar with the elements of a vector
 vector<double> operator/(double const &scalar, vector<double> const &vec){
     vector<double> res;
     for (int i = 0; i < vec.size(); ++i){
@@ -65,6 +72,7 @@ vector<double> operator/(double const &scalar, vector<double> const &vec){
     return res;
 }
 
+// subtracts the elements of one vector with another vector
 vector<double> operator-(vector<double> const &vec1, vector<double> const &vec2){
     vector<double> res;
     if (vec1.size() != vec2.size()){
@@ -76,6 +84,7 @@ vector<double> operator-(vector<double> const &vec1, vector<double> const &vec2)
     return res;
 }
 
+// adds the elements of a vector with a scalar
 vector<double> operator+(vector<double> const &vec, double const &scalar){
     vector<double> res;
     for (int i = 0; i < vec.size(); ++i){
@@ -84,6 +93,7 @@ vector<double> operator+(vector<double> const &vec, double const &scalar){
     return res;
 }
 
+// adds the elements of a vector with a scalar
 vector<double> operator+(double const &scalar, vector<double> const &vec){
     vector<double> res;
     for (int i = 0; i < vec.size(); ++i){
@@ -92,6 +102,7 @@ vector<double> operator+(double const &scalar, vector<double> const &vec){
     return res;
 }
 
+// subtracts the elements of a vector with a scalar
 vector<double> operator-(vector<double> const &vec, double const &scalar){
     vector<double> res;
     for (int i = 0; i < vec.size(); ++i){
@@ -100,6 +111,7 @@ vector<double> operator-(vector<double> const &vec, double const &scalar){
     return res;
 }
 
+// subtracts a scalar with the elements of a vector
 vector<double> operator-(double const &scalar, vector<double> const &vec){
     vector<double> res;
     for (int i = 0; i < vec.size(); ++i){
@@ -108,6 +120,7 @@ vector<double> operator-(double const &scalar, vector<double> const &vec){
     return res;
 }
 
+// takes the absolute value of all elements of a vector
 vector<double> vectorAbs(vector<double> const &vec){
     vector<double> res;
     for (unsigned int i = 0; i < vec.size(); ++i){
@@ -120,6 +133,7 @@ vector<double> vectorAbs(vector<double> const &vec){
     return res;
 }
 
+// returns the maximum value of all elements in a vector
 double vectorMax(vector<double> const &vec){
     double max = numeric_limits<double>::lowest();
     for (unsigned int i = 0; i < vec.size(); ++i){
@@ -130,6 +144,7 @@ double vectorMax(vector<double> const &vec){
     return max;
 }
 
+// takes the square root of all elements of a vector
 vector<double> vectorSqrt(vector<double> const &vec){
     vector<double> res;
     for (unsigned int i = 0; i < vec.size(); ++i){
