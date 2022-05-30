@@ -1,26 +1,33 @@
 #include "particleLSM.h"
 
+// initializes particles in a cell where (x0, y0, z0) are the coordinates of the cell closest ot origo.
+// dx, dy, dz are the grid spacing. X, Y, Z are all grid nodes in the computational domain.
+// phi is the signed distance field. normal is the normal-vector. M, N, P is the number of grid nodes in each direction.
+// numParticles are the number of particles of each type to be initialized in the cell.
 vector<Particle> initializeParticles(double x0, double y0, double z0, double dx, double dy, double dz,
     vector<double> &X, vector<double> &Y, vector<double> &Z, vector<double> &phi, Derivative &normal,
-    int M, int N, int P, int numParticles){ // ikke ta inn hele phi og N
-    // x0, y0, z0 is lower left coordinate in cell.
+    int M, int N, int P, int numParticles){
+
     vector<Particle> particles;
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
     std::uniform_int_distribution<> distr(0, 100); // define the range
-    double rmin = 0.1*min(dx, min(dy, dz));
-    double rmax = 0.5*max(dx, max(dy, dz));
+    double rmin = 0.1*min(dx, min(dy, dz)); // minimum particle radius
+    double rmax = 0.5*max(dx, max(dy, dz)); // maximum particle radius
     double bmin = rmin;
     double bmax = 3.0*max(dx, max(dy, dz));
     double lambda = 1.0;
-    double itmax = 15;
+    double itmax = 15; // max iterations in the attraction step
     for (int p = 0; p < numParticles*2; ++p){
         int positive = p%2; // even negative, odd positive
+
+        // random coordinate in a cell
         double x = x0 + dx*distr(gen)/100.0;
         double y = y0 + dy*distr(gen)/100.0;
         double z = z0 + dz*distr(gen)/100.0;
         double phip;
 
+        // index position of the particle
         int i = (int)(x/dx);
         int j = (int)(y/dy);
         int k = (int)(z/dz);
@@ -110,9 +117,13 @@ vector<Particle> initializeParticles(double x0, double y0, double z0, double dx,
     return particles;
 }
 
+// returns the corrected values of the signed distance field for each corner of the cells.
+// the xi, yj, zk values are the coordinates of the corners of the cell, where x0 < x1, y0 < y1, z0 < z1.
+// the phiijk are the values of the signed distance fiield at (i,j,k)
 vector<double> correctInterface(Particle p, double x0, double x1, double y0, double y1, double z0, double z1,
     double phi000, double phi100, double phi110, double phi010, double phi001, double phi101, double phi111, double phi011, double phip){
 
+    // distance from particle surface to cell corners
     double phip000 = sign(phip)*(p.r - sqrt(pow(x0 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
     double phip100 = sign(phip)*(p.r - sqrt(pow(x1 - p.x, 2) + pow(y0 - p.y, 2) + pow(z0 - p.z, 2)));
     double phip110 = sign(phip)*(p.r - sqrt(pow(x1 - p.x, 2) + pow(y1 - p.y, 2) + pow(z0 - p.z, 2)));
@@ -154,10 +165,12 @@ vector<double> correctInterface(Particle p, double x0, double x1, double y0, dou
     return phi;
 }
 
+// returns the interpolated value at (x, y, z)
+// the xi, yj, zk values are the coordinates of the corners of the cell, where x0 < x1, y0 < y1, z0 < z1.
+// the phiijk are the values of the signed distance fiield at (i,j,k)
 double trilinearInterpolation(double x, double y, double z, double x0, double x1, double y0, double y1, double z0, double z1,
     double c000, double c100, double c110, double c010, double c001, double c101, double c111, double c011){
-    // x, y, z are the target coordinates, c... are values with reference to lower left node of unit cube,
-    // x0 and x1 etc. are coordinates for the corners of the cube with x0 < x1.
+
     double xd = (x - x0)/(x1 - x0);
     double yd = (y - y0)/(y1 - y0);
     double zd = (z - z0)/(z1 - z0);
@@ -173,6 +186,7 @@ double trilinearInterpolation(double x, double y, double z, double x0, double x1
     return c0*(1 - zd) + c1*zd;
 }
 
+// returns the normal vectors Nx, Ny, Nz for the signed distance field
 Derivative normal(vector<double> &arr, double dx, double dy, double dz, double M, double N, double P){
     vector<double> Nx;
     vector<double> Ny;
@@ -207,6 +221,7 @@ Derivative normal(vector<double> &arr, double dx, double dy, double dz, double M
     return Derivative{Nx, Ny, Nz};
 }
 
+// saves the coordinates of all the particles to a .txt-files
 void plotParticles(string filename, vector<Particle> particles){
     ofstream file;
     file.open(filename);
