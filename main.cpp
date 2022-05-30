@@ -332,7 +332,7 @@ int main(){
         if (doReinit && (it%reinitFreq == 0)){
             vector<double> phi0 = phi;
             for (int i = 0; i < reinitSteps - 1; ++i){
-                // euler_upwind_reinit(phi, m, n, p, dx, dy, dz, dtau, phi0);
+                // euler_godunov_reinit(phi, m, n, p, dx, dy, dz, dtau, phi0);
                 TVDRK3_godunov_reinit(phi, m, n, p, dx, dy, dz, dtau, phi0);
             }
         }
