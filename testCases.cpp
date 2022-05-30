@@ -1,5 +1,6 @@
 #include "testCases.h"
 
+// velocity field for deformation in 3D. Taken from LeVeque (1996)
 Velocity vortexVelocity(int M, int N, int P, vector<double> X, vector<double> Y, vector<double> Z, double t, double T){
 
     vector<double> U;
@@ -18,6 +19,7 @@ Velocity vortexVelocity(int M, int N, int P, vector<double> X, vector<double> Y,
     return Velocity {U, V, W};
 }
 
+// velocity field for deformation in 2D. Taken from Morgan and Waltz (2017)
 Velocity shearedSphereVelocity(int M, int N, int P, vector<double> X, vector<double> Y, vector<double> Z, double t, double T){
 
     vector<double> U;
@@ -36,6 +38,7 @@ Velocity shearedSphereVelocity(int M, int N, int P, vector<double> X, vector<dou
     return Velocity {U, V, W};
 }
 
+// simple velocity field with u = v = w = 1 for all grid nodes
 Velocity simpleVelocity(int M, int N, int P){
     vector<double> U = linspace(1, 1, M*N*P);
     vector<double> V = linspace(1, 1, M*N*P);
@@ -43,6 +46,7 @@ Velocity simpleVelocity(int M, int N, int P){
     return Velocity {U, V, W};
 }
 
+// returns the volume of the domain bounded by the zero contour in a signed distance field
 double volume(vector<double> &phi, double dx, double dy, double dz){
     double epsilon = 1.5*dx;
     double V = 0;
@@ -60,6 +64,7 @@ double volume(vector<double> &phi, double dx, double dy, double dz){
     return V;
 }
 
+// returns the surface area of the domain bounded by the zero contour in a signed distance field
 double surfaceArea(vector<double> &phi, double dx, double dy, double dz, double M, double N, double P){
     double A = 0;
     double epsilon = 1.5*dx;
@@ -99,6 +104,7 @@ double surfaceArea(vector<double> &phi, double dx, double dy, double dz, double 
     return A;
 }
 
+// error measure of the interface error
 double interfaceError(vector<double> &phi0, vector<double> &phi, double dx, double dy, double dz, double M, double N, double P){
     double epsilon = 1.5*dx;
     double A = surfaceArea(phi0, dx, dy, dz, M, N, P);
@@ -113,6 +119,7 @@ double interfaceError(vector<double> &phi0, vector<double> &phi, double dx, doub
     return L1/A;
 }
 
+// error measure of the average mass error
 double massError(vector<double> &phi, double dx, double dy, double dz, double M, double N, double P){
     double error = 0;
     for (int k = 0; k < P; ++k){
