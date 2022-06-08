@@ -11,7 +11,7 @@ These files contain code to create the initial signed distance field with refere
 function to save the signed distance field to a .txt-file.
 
 particleLSM
-These files contain code to set up the particles in the particle level set method, use these particles to correct the interface, and a function to save the particle coordinates to a .txt-file. particleLSM.h is given first and contains the header file, while particleLSM.cpp contains the whole implementation.
+These files contain code to set up the particles in the particle level set method, use these particles to correct the interface, and a function to save the particle coordinates to a .txt-file.
 
 schemes
 These files contain all the numerical schemes used in the implemented particle level set method.
@@ -20,7 +20,7 @@ testCases
 These files contain code to generate the velocity fields and the computation of the error measures.
 
 vectorUtilities
-These files contain code used for various vector operations. vectorUtilities.h is given first and contains the header file, while vectorUtilities.cpp contains the whole implementation.
+These files contain code used for various vector operations.
 
 plotter.py
 This file contains the Python code to find the interface with the marching cubes algorithm using the scikit-image Python library, and also code to plot the interface and the particles used in the particle level set method.
